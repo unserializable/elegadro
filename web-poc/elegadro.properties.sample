@@ -1,0 +1,3 @@
+elegadro.neo4j.uri=bolt://host:7687
+elegadro.neo4j.user.name=user
+elegadro.neo4j.user.password=password

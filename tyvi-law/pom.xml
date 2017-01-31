@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.elegadro</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>0.6</version>
+    </parent>
+
+    <artifactId>tyvi-law</artifactId>
+    <version>0.2-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>Estonian 'tyviseadus' to Java.</name>
+    <description>
+        Estonian 'tyviseadus' XML Schema JAXB compilation with Visitor API inclusion.
+        This artifact compiles 'juurakt' and 'tyviseadus' only.
+        
+        Published URLs with legal schemas (converted to https):
+        https://xmlr.eesti.ee/xml/schemas/oigusakt/juurakt_1_10.02.2010.xsd
+        https://xmlr.eesti.ee/xml/schemas/oigusakt/tyviseadus_1_10.02.2010.xsd
+
+        Other published Estonian law XML schemas at:
+        https://riha.eesti.ee/riha/main/xml/oigusakt
+    </description>
+    <inceptionYear>2017</inceptionYear>
+
+    <organization>
+        <name>Koodivendade Ordu</name>
+    </organization>
+
+    <developers>
+        <developer>
+            <name>Taimo Peelo</name>
+            <organization>Koodivendade Ordu</organization>
+        </developer>
+    </developers>
+
+    <build>
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-http</artifactId>
+                <version>2.10</version>
+            </extension>
+        </extensions>
+
+        <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>1.4.1</version>
+                <executions>
+                    <execution>
+                        <id>enforce-versions</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireMavenVersion>
+                                    <version>[3.3.3,)</version>
+                                </requireMavenVersion>
+                                <requireJavaVersion>
+                                    <version>[1.8.0,)</version>
+                                </requireJavaVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <addMavenDescriptor>false</addMavenDescriptor>
+                        <compress>true</compress>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <!-- this is NOT official Maven plugin, only named like one:
+                 https://github.com/highsource/maven-jaxb2-plugin -->
+            <plugin>
+                <groupId>org.jvnet.jaxb2.maven2</groupId>
+                <artifactId>maven-jaxb2-plugin</artifactId>
+                <version>0.13.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+
+                <configuration>
+                    <extension>true</extension>
+                    <args>
+                        <arg>-Xvisitor</arg>
+                    </args>
+
+                    <!-- Plugins in da plugins and Visitor API generation. -->
+                    <plugins>
+                        <plugin>
+                            <groupId>com.massfords</groupId>
+                            <artifactId>jaxb-visitor</artifactId>
+                            <version>2.5</version>
+                        </plugin>
+                    </plugins>
+                </configuration>
+            </plugin>
+
+        </plugins>
+
+    </build>
+
+</project>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="araneaConfiguration" class="org.araneaframework.uilib.core.StandardConfiguration" scope="prototype">
+        <property name="confEntries">
+            <map>
+                <entry key="uilib.widgets.lists.DefaultListItemsOnPage">
+                    <value type="java.lang.Long">15</value>
+                </entry>
+                <entry key="uilib.widgets.lists.FullListItemsOnPage">
+                    <value type="java.lang.Long">50</value>
+                </entry>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="araneaApplicationStart"
+          class="org.elegadro.poc.web.SMMRootWidget"
+          scope="prototype"/>
+
+    <bean id="araneaLocalizationFilter" scope="prototype"
+          class="org.elegadro.poc.l10n.SMML10nFilterService">
+        <property name="languageName" value="et"/>
+    </bean>
+
+    <bean id="araneaCustomSessionFilters" scope="prototype" class="org.araneaframework.framework.filter.StandardFilterChainService">
+        <property name="filterChain">
+            <list>
+                <ref bean="araneaSerializingAudit"/>
+            </list>
+        </property>
+    </bean>
+
+</beans>

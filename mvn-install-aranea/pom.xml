@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.elegadro</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>0.6</version>
+    </parent>
+
+    <artifactId>mvn-install-aranea</artifactId>
+    <version>1.2.2</version>
+    <packaging>pom</packaging>
+
+    <name>Aranea installation in local Maven repository.</name>
+    <description>
+      In PoC, Aranea web framework was used, which distribution URLS do not follow standard path
+      conventions and are not readily installable via Maven. This is a skeleton artifact that
+      installs into local Maven repository the files that are only available in the web under 
+      non-standard resource location patterns.
+
+      Namely:
+        aranea-1.2.2.jar
+        base64-1.0.jar
+    </description>
+
+    <inceptionYear>2017</inceptionYear>
+
+    <organization>
+      <name>Koodivendade Ordu</name>
+    </organization>
+
+    <developers>
+      <developer>
+        <name>Taimo Peelo</name>
+        <organization>Koodivendade Ordu</organization>
+      </developer>
+    </developers>
+
+    <properties>
+        <applibs.folder>${project.basedir}/.applibs</applibs.folder>
+        <aranea.version>${project.version}</aranea.version>
+        <aranea.base64.version>1.0</aranea.base64.version>
+    </properties>
+
+    <build>
+        <defaultGoal>install</defaultGoal>
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-http</artifactId>
+                <version>2.10</version>
+            </extension>
+        </extensions>
+
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>wagon-maven-plugin</artifactId>
+                    <version>1.0</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>1.4.1</version>
+                </plugin>
+
+               <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-clean-plugin</artifactId>
+                  <version>3.0.0</version>
+               </plugin>
+
+               <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-install-plugin</artifactId>
+                  <version>2.5.2</version>
+               </plugin>
+
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>1.4.1</version>
+                <executions>
+                    <execution>
+                        <id>enforce-versions</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireMavenVersion>
+                                    <version>[3.3.3,)</version>
+                                </requireMavenVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>wagon-maven-plugin</artifactId>
+                <extensions>true</extensions>
+                <executions>
+                    <execution>
+                        <id>aranea</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>download-single</goal>
+                        </goals>
+                        <configuration>
+                            <url>https://dl.bintray.com/nortal/araneaframework/araneaframework/aranea-mvc/${aranea.version}</url>
+                            <fromFile>aranea-${aranea.version}.jar</fromFile>
+                            <toDir>${applibs.folder}</toDir>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>aranea-specific</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>download-single</goal>
+                        </goals>
+                        <configuration>
+                            <url>https://dl.bintray.com/nortal/araneaframework/base64/base64/${aranea.base64.version}</url>
+                            <fromFile>base64-${aranea.base64.version}.jar</fromFile>
+                            <toDir>${applibs.folder}</toDir>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>install-aranea</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${applibs.folder}/aranea-${aranea.version}.jar</file>
+                            <repositoryLayout>default</repositoryLayout>
+                            <groupId>araneaframework</groupId>
+                            <artifactId>aranea</artifactId>
+                            <version>${aranea.version}</version>
+                            <packaging>jar</packaging>
+                            <generatePom>true</generatePom>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>install-aranea-specific</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>${applibs.folder}/base64-${aranea.base64.version}.jar</file>
+                            <repositoryLayout>default</repositoryLayout>
+                            <groupId>base64</groupId>
+                            <artifactId>base64</artifactId>
+                            <version>${aranea.base64.version}</version>
+                            <packaging>jar</packaging>
+                            <generatePom>true</generatePom>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+
+    </build>
+
+</project>

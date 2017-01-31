@@ -1,0 +1,8 @@
+https://xmlr.eesti.ee/xml/schemas/oigusakt/juurakt_1_10.02.2010.xsd
+https://xmlr.eesti.ee/xml/schemas/oigusakt/konteiner_1_8.09.2010.xsd
+https://xmlr.eesti.ee/xml/schemas/oigusakt/maarus_1_10.02.2010.xsd
+https://xmlr.eesti.ee/xml/schemas/oigusakt/muutmismaarus_1_10.02.2010.xsd
+https://xmlr.eesti.ee/xml/schemas/oigusakt/muutmisseadus_1_10.02.2010.xsd
+https://xmlr.eesti.ee/xml/schemas/oigusakt/riigikoguotsus_1_10.02.2010.xsd
+https://xmlr.eesti.ee/xml/schemas/oigusakt/tyviseadus_1_10.02.2010.xsd
+https://xmlr.eesti.ee/xml/schemas/oigusakt/yksikakt_1_10.02.2010.xsd

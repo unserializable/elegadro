@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- ########## ARANEA CONFIGURATION ########## -->
+
+    <bean id="araneaApplicationRoot" class="org.araneaframework.http.core.StandardServletServiceAdapterComponent"
+          scope="prototype">
+        <property name="childService" ref="araneaApplicationFilters"/>
+    </bean>
+
+    <bean id="araneaApplicationFilters" scope="prototype"
+          class="org.araneaframework.framework.filter.StandardFilterChainService">
+        <property name="childService" ref="araneaTopServiceRouter"/>
+        <property name="filterChain">
+            <list>
+                <ref bean="araneaCriticalErrorHandler"/>
+                <ref bean="araneaStatisticFilter"/>
+                <ref bean="araneaRequestEncodingFilter"/>
+                <ref bean="araneaFileUploadFilter"/>
+                <bean class="org.araneaframework.integration.spring.SpringOptionalFilterService" scope="prototype">
+                    <property name="beanId" value="araneaCustomApplicationFilters"/>
+                </bean>
+                <ref bean="araneaFileImportFilter"/>
+                <ref bean="araneaMountingFilter"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean class="org.araneaframework.framework.router.StandardTopServiceRouterService" id="araneaTopServiceRouter"
+          scope="prototype">
+        <property name="defaultServiceId" value="application"/>
+        <property name="serviceMap">
+            <map>
+                <entry key="application" value-ref="araneaSessionRouter"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean class="org.araneaframework.http.router.StandardHttpSessionRouterService" id="araneaSessionRouter"
+          scope="prototype">
+        <property name="sessionServiceFactory" ref="araneaSessionServiceFactory"/>
+    </bean>
+
+    <bean class="org.araneaframework.integration.spring.SpringServiceFactory" id="araneaSessionServiceFactory"
+          scope="prototype">
+        <property name="beanId">
+            <idref bean="araneaSessionFilters"/>
+        </property>
+    </bean>
+
+    <!-- Session scope -->
+
+    <bean id="araneaSessionFilters" scope="prototype"
+          class="org.araneaframework.framework.filter.StandardFilterChainService">
+        <property name="childService" ref="araneaThreadServiceRouter"/>
+        <property name="filterChain">
+            <list>
+                <ref bean="araneaLocalizationFilter"/>
+                <ref bean="araneaJspConfigFilter"/>
+                <bean class="org.araneaframework.integration.spring.SpringOptionalFilterService" scope="prototype">
+                    <property name="beanId" value="araneaCustomSessionFilters"/>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+
+    <bean class="org.araneaframework.framework.router.StandardThreadServiceRouterService"
+          id="araneaThreadServiceRouter" scope="prototype">
+        <property name="defaultServiceId" value="mainThread"/>
+        <property name="serviceMap">
+            <map>
+                <entry key="mainThread" value-ref="araneaThreadFilters"/>
+            </map>
+        </property>
+    </bean>
+
+    <!-- Thread scope -->
+
+    <bean id="araneaThreadFilters" scope="prototype"
+          class="org.araneaframework.framework.filter.StandardFilterChainService">
+        <property name="childService" ref="araneaWidgetAdapter"/>
+        <property name="filterChain">
+            <list>
+                <ref bean="araneaThreadCloningFilter"/>
+                <ref bean="araneaMountPointFilter"/>
+                <ref bean="araneaResponseHeaderFilter"/>
+                <ref bean="araneaSystemFormFilter"/>
+                <ref bean="araneaContinuationFilter"/>
+                <bean class="org.araneaframework.integration.spring.SpringOptionalFilterService" scope="prototype">
+                    <property name="beanId" value="araneaCustomThreadFilters"/>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean class="org.araneaframework.framework.container.StandardWidgetAdapterService"
+          id="araneaWidgetAdapter"
+          scope="prototype">
+        <property name="childWidget" ref="araneaWidgetFilters"/>
+    </bean>
+
+    <!-- Framework widgets -->
+
+    <bean id="araneaWidgetFilters" scope="prototype"
+          class="org.araneaframework.framework.filter.StandardFilterChainWidget">
+        <property name="childWidget" ref="araneaOverlayContainer"/>
+        <property name="filterChain">
+            <list>
+                <ref bean="araneaStateVersioningFilter"/>
+                <ref bean="araneaRedirectingFilter"/>
+                <ref bean="araneaTransactionFilter"/>
+                <ref bean="araneaUpdateRegionFilter"/>
+                <ref bean="araneaConfirmationFilter"/>
+                <ref bean="araneaRenderStatusResettingFilter"/>
+                <ref bean="araneaMessagingFilter"/>
+                <ref bean="araneaEnvContextFilter"/>
+                <ref bean="araneaPopupFilter"/>
+                <bean class="org.araneaframework.integration.spring.SpringOptionalFilterWidget" scope="prototype">
+                    <property name="beanId" value="araneaCustomWidgetFilters"/>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <!-- Default state versioning widget is NOOP, override with org.araneaframework.http.filter.StandardStateVersioningFilterWidget -->
+    <bean class="org.araneaframework.framework.core.NopFilterWidget" id="araneaStateVersioningFilter" scope="prototype"/>
+
+    <bean class="org.araneaframework.http.filter.StandardPopupFilterWidget" id="araneaPopupFilter" scope="prototype">
+        <property name="threadServiceFactory">
+            <bean class="org.araneaframework.integration.spring.SpringServiceFactory" scope="prototype">
+                <property name="beanId">
+                    <idref bean="araneaThreadFilters"/>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <bean class="org.araneaframework.framework.container.StandardOverlayContainerWidget" id="araneaOverlayContainer" scope="prototype">
+        <property name="main" ref="araneaRootFlowContainer"/>
+        <property name="overlay" ref="araneaOverlayRootContainer"/>
+    </bean>
+
+    <bean class="org.araneaframework.framework.container.RootFlowContainerWidget" id="araneaRootFlowContainer" scope="prototype">
+        <property name="top" ref="araneaApplicationStart"/>
+    </bean>
+
+    <bean class="org.araneaframework.framework.container.StandardFlowContainerWidget" id="araneaOverlayRootContainer" scope="prototype"/>
+
+    <!-- ########## ARANEA FILTERS ########## -->
+
+    <bean
+            class="org.araneaframework.framework.filter.StandardCriticalExceptionHandlingFilterService"
+            id="araneaCriticalErrorHandler" scope="prototype">
+        <property name="exceptionHandlerFactory">
+            <bean class="org.araneaframework.http.service.SimpleCriticalErrorHandlerService$Factory"
+                  scope="prototype"/>
+        </property>
+    </bean>
+
+    <bean class="org.araneaframework.http.filter.StandardRequestEncodingFilterService"
+          id="araneaRequestEncodingFilter" scope="prototype">
+        <property name="requestEncoding" value="${l10n.encoding}"/>
+    </bean>
+
+    <bean class="org.araneaframework.http.filter.StandardHttpResponseFilterService"
+          id="araneaResponseHeaderFilter" scope="prototype">
+    </bean>
+
+    <bean class="org.araneaframework.http.filter.StandardFileImportFilterService"
+          id="araneaFileImportFilter" scope="prototype">
+    </bean>
+
+    <bean class="org.araneaframework.framework.filter.StandardSystemFormFilterService"
+          id="araneaSystemFormFilter" scope="prototype">
+    </bean>
+
+    <bean class="org.araneaframework.framework.filter.StandardStatisticFilterService"
+          id="araneaStatisticFilter" scope="prototype">
+        <property name="message" value="Total request time: "/>
+    </bean>
+
+    <bean class="org.araneaframework.framework.filter.StandardSerializingAuditFilterService"
+          id="araneaSerializingAudit" scope="prototype">
+    </bean>
+
+    <bean class="org.araneaframework.framework.filter.StandardLocalizationFilterService"
+          id="araneaLocalizationFilter" scope="prototype">
+        <property name="resourceBundleName" value="${l10n.resourceBundle}"/>
+        <property name="languageName" value="${l10n.defaultLocale}"/>
+    </bean>
+
+    <bean class="org.araneaframework.http.filter.StandardJspFilterService"
+          id="araneaJspConfigFilter" scope="prototype">
+        <property name="submitCharset" value="${l10n.encoding}"/>
+        <property name="jspPath" value="${jsp.path}"/>
+        <property name="jspExtension" value=".jspx"/>
+    </bean>
+
+    <bean class="org.araneaframework.http.filter.StandardMountingFilterService"
+          id="araneaMountingFilter" scope="prototype">
+    </bean>
+
+    <bean class="org.araneaframework.framework.filter.StandardMountPointFilterService"
+          id="araneaMountPointFilter" scope="prototype">
+    </bean>
+
+    <bean class="org.araneaframework.http.filter.StandardFileUploadFilterService"
+          id="araneaFileUploadFilter" scope="prototype">
+    </bean>
+
+    <bean class="org.araneaframework.framework.filter.StandardContinuationFilterService"
+          id="araneaContinuationFilter" scope="prototype">
+    </bean>
+
+    <bean class="org.araneaframework.framework.filter.StandardTransactionFilterWidget"
+          id="araneaTransactionFilter" scope="prototype">
+    </bean>
+
+    <bean class="org.araneaframework.http.filter.StandardRedirectingFilterWidget"
+          id="araneaRedirectingFilter" scope="prototype">
+    </bean>
+
+    <bean class="org.araneaframework.framework.filter.StandardMessagingFilterWidget"
+          id="araneaMessagingFilter" scope="prototype">
+    </bean>
+
+    <bean class="org.araneaframework.framework.filter.StandardContextMapFilterWidget"
+          id="araneaEnvContextFilter" scope="prototype">
+        <property name="contexts">
+            <map>
+                <entry key="org.araneaframework.uilib.ConfigurationContext.class" value-ref="araneaConfiguration"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean class="org.araneaframework.http.filter.StandardWindowScrollPositionFilterWidget" scope="prototype"
+          id="araneaScrollingFilter"/>
+
+    <bean class="org.araneaframework.http.filter.StandardThreadCloningFilterService"
+          id="araneaThreadCloningFilter"
+          scope="prototype">
+    </bean>
+
+    <bean class="org.araneaframework.http.filter.StandardUpdateRegionFilterWidget"
+          id="araneaUpdateRegionFilter" scope="prototype">
+    </bean>
+
+    <bean class="org.araneaframework.framework.filter.StandardRenderStatusResettingFilterWidget"
+          id="araneaRenderStatusResettingFilter" scope="prototype">
+    </bean>
+
+    <bean class="org.araneaframework.framework.StandardConfirmationFilterWidget"
+          id="araneaConfirmationFilter" scope="prototype">
+    </bean>
+
+    <bean id="araneaConfiguration" class="org.araneaframework.uilib.core.StandardConfiguration" scope="prototype"/>
+</beans>

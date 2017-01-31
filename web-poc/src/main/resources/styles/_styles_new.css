@@ -1,0 +1,20 @@
+/* containers - template application */
+/*   background: #fcfdee; */
+
+span.display { padding: 6px 5px 5px 5px; text-align: left; }
+
+.errorLink {font-size: larger}
+
+.aranea-label { padding: 5px; white-space: nowrap; vertical-align: middle; text-align: right; font-size: 11px; font-weight: bold; color: #5B5B5B }
+
+input.aranea-short-text-input { width: 10em; }
+
+/* Validation flag */
+span.form-element-valid { color: red; background-color: black; }
+.form-element-valid img.validation-flag { visibility: hidden; }
+.form-element-invalid img.validation-flag { visibility: visible; }
+
+div.tree { padding: 10px; }
+div.tree div.level { padding: 0 0 4px 15px; }
+div.tree div.item { padding: 0 0 4px 15px; background: url(../fileimporter/gfx/dot02.gif) 7px 5px no-repeat; }
+

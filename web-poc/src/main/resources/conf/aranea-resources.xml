@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+
+    <files content-type="text/css" group="smm.css">
+        <file path="styles/_styles_global.css" />
+        <file path="styles/_styles_screen.css" />
+        <file path="styles/_styles_new.css" />
+    </files>
+
+    <files content-type="text/css" group="patternfly.css">
+        <file path="patternfly/css/patternfly.css" />
+        <file path="patternfly/css/patternfly-additions.css" />
+    </files>
+
+    <files content-type="text/javascript" group="jquery.js">
+        <file path="jq/jquery.js" />
+    </files>
+
+    <files content-type="text/javascript" group="jquery.matchHeight.js">
+        <file path="jq/jquery.matchHeight.js" />
+    </files>
+
+    <files content-type="text/javascript" group="patternfly.js">
+        <file path="patternfly/js/patternfly.js" />
+    </files>
+
+    <files content-type="text/javascript" group="bootstrap.js">
+        <file path="bs/js/bootstrap.js" />
+    </files>
+
+    <!--
+        Other scripts that should not be omnipresent but which must be
+        accessible to fileimporter.
+    -->
+
+    <files content-type="image/gif">
+        <file path="gfx/i01.gif" />
+        <file path="gfx/i02.gif" />
+        <file path="gfx/i03.gif" />
+        <file path="gfx/i04.gif" />
+        <file path="gfx/i05.gif" />
+        <file path="gfx/i06.gif" />
+        <file path="gfx/i07.gif" />
+        <file path="gfx/i08.gif" />
+        <file path="gfx/i09.gif" />
+        <file path="gfx/i10.gif" />
+        <file path="gfx/i11.gif" />
+        <file path="gfx/i12.gif" />
+        <file path="gfx/i13.gif" />
+        <file path="gfx/i14.gif" />
+        <file path="gfx/i15.gif" />
+        <file path="gfx/i16.gif" />
+        <file path="gfx/i37.gif" />
+        <file path="gfx/i38.gif" />
+        <file path="gfx/i39.gif" />
+        <file path="gfx/i40.gif" />
+        <file path="gfx/ico_first.gif" />
+        <file path="gfx/ico_last.gif" />
+        <file path="gfx/ico_next.gif" />
+        <file path="gfx/ico_prev.gif" />
+        <file path="gfx/ico_sortdown.gif" />
+        <file path="gfx/ico_sortup.gif" />
+        <file path="gfx/logo_aranea_print.gif" />
+        <file path="gfx/logo_aranea_screen.jpg" />
+        <file path="gfx/logo_aranea_login.jpg" />
+        <file path="gfx/ico/ai.gif" />
+        <file path="gfx/ico/avi.gif" />
+        <file path="gfx/ico/bmp.gif" />
+        <file path="gfx/ico/cdr.gif" />
+        <file path="gfx/ico/csv.gif" />
+        <file path="gfx/ico/doc.gif" />
+        <file path="gfx/ico/eml.gif" />
+        <file path="gfx/ico/exe.gif" />
+        <file path="gfx/ico/gif.gif" />
+        <file path="gfx/ico/html.gif" />
+        <file path="gfx/ico/jpg.gif" />
+        <file path="gfx/ico/mdb.gif" />
+        <file path="gfx/ico/mp3.gif" />
+        <file path="gfx/ico/mpg.gif" />
+        <file path="gfx/ico/pdf.gif" />
+        <file path="gfx/ico/png.gif" />
+        <file path="gfx/ico/ppt.gif" />
+        <file path="gfx/ico/psd.gif" />
+        <file path="gfx/ico/rar.gif" />
+        <file path="gfx/ico/txt.gif" />
+        <file path="gfx/ico/xls.gif" />
+        <file path="gfx/ico/zip.gif" />
+        <file path="gfx/bg16.gif" />
+        <file path="gfx/butt_accept.gif" />
+        <file path="gfx/butt_expand.gif" />
+        <file path="gfx/butt_delete2.gif" />
+        <file path="gfx/butt_delete3.gif" />
+        <file path="gfx/butt_add.gif" />
+        <file path="gfx/butt_add3.gif" />
+        <file path="gfx/butt_maximize.gif" />
+        <file path="gfx/butt_minimize.gif" />
+        <file path="gfx/butt_change2.gif" />
+        <file path="gfx/butt_change3.gif" />
+        <file path="gfx/butt_search.gif" />
+        <file path="gfx/butt_personal.gif" />
+        <file path="gfx/butt_privileegid.gif" />
+        <file path="gfx/dot01.gif" />
+        <file path="gfx/dot02.gif" />
+        <file path="gfx/dot03.gif" />
+        <file path="gfx/dot04.gif" />
+        <file path="gfx/dot04_disabled.gif" />
+        <file path="gfx/dot05.gif" />
+        <file path="gfx/dot05_red.gif" />
+        <file path="gfx/dot06.gif" />
+        <file path="gfx/dot07.gif" />
+        <file path="gfx/dot08.gif" />
+        <file path="gfx/dot09.gif" />
+        <file path="gfx/dot10.gif" />
+        <file path="gfx/dot11.gif" />
+        <file path="gfx/dot12.gif" />
+        <file path="gfx/dot13.gif" />
+        <file path="gfx/dot14.gif" />
+        <file path="gfx/dot15.gif" />
+        <file path="gfx/dot16.gif" />
+        <file path="gfx/dot17.gif" />
+        <file path="gfx/dot18.gif" />
+        <file path="gfx/dot19.gif" />
+        <file path="gfx/ico_add.gif" />
+        <file path="gfx/ico_add2.gif" />
+        <file path="gfx/ico_add3.gif" />
+        <file path="gfx/ico_delete.gif" />
+        <file path="gfx/ico_flag.gif" />
+        <file path="gfx/pages_b.gif" />
+        <file path="gfx/pages_bb.gif" />
+        <file path="gfx/pages_f.gif" />
+        <file path="gfx/pages_ff.gif" />
+        <file path="gfx/calendar_close.gif" />
+        <file path="gfx/calendar_ico_left.gif" />
+        <file path="gfx/calendar_ico_open.gif" />
+        <file path="gfx/calendar_ico_right.gif" />
+        <file path="gfx/calendar_scrolldown.gif" />
+        <file path="gfx/calendar_scrollup.gif" />
+    </files>
+
+    <!-- favicons -->
+    <files content-type="image/png">
+        <file path="fav/favicon-114.png"/>
+        <file path="fav/favicon-120.png"/>
+        <file path="fav/favicon-144.png"/>
+        <file path="fav/favicon-150.png"/>
+        <file path="fav/favicon-152.png"/>
+        <file path="fav/favicon-160.png"/>
+        <file path="fav/favicon-16.png"/>
+        <file path="fav/favicon-180.png"/>
+        <file path="fav/favicon-192.png"/>
+        <file path="fav/favicon-310.png"/>
+        <file path="fav/favicon-32.png"/>
+        <file path="fav/favicon-57.png"/>
+        <file path="fav/favicon-60.png"/>
+        <file path="fav/favicon-64.png"/>
+        <file path="fav/favicon-70.png"/>
+        <file path="fav/favicon-72.png"/>
+        <file path="fav/favicon-76.png"/>
+        <file path="fav/favicon-96.png"/>
+    </files>
+
+    <files content-type="image/svg+xml">
+        <file path="gfx/smm/smm-logo-first.svg"/>
+        <file path="gfx/smm/smm-logo-second.svg"/>
+    </files>
+
+    <files content-type="image/x-icon">
+        <file path="fav/favicon.ico"/>
+    </files>
+
+    <files content-type="text/xml">
+        <file path="fav/browserconfig.xml"/>
+    </files>
+</resources>

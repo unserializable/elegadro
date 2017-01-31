@@ -1,0 +1,51 @@
+# Eclipse
+.classpath
+.project
+.settings/
+ 
+# Intellij
+.idea/
+*.iml
+*.iws
+ 
+# Mac custom attributes of containing folder
+.DS_Store
+   
+# Maven
+log/
+target/
+
+# Maven Shade plugin
+dependency-reduced-pom.xml
+
+# folder for dependencies from repositories with non-standard layout
+.applibs/
+
+# VIM working files
+*.swp
+tags
+Session.vim
+
+# JVM crash logs 
+hs_err_pid*
+
+# Java artifacts and class files
+*.class
+*.jar
+*.war
+*.ear
+
+# Backup files created by some *NIX editors
+*~
+
+# KDE directory prefs
+.directory
+
+# Sometimes appearing Linux trash folder
+.Trash-*
+
+# (Linux) created when an open file is removed but is still being accessed
+.nfs*
+
+# Rule to not accidentally publish keyrings
+secring.*

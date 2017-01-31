@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jsp:root
+	xmlns:jsp="http://java.sun.com/JSP/Page"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:ui="http://araneaframework.org/tag-library/standard_rt"
+	version="2.0">
+
+	<ui:widgetContext>
+		<![CDATA[<!DOCTYPE html>]]>
+		<html class="layout-pf layout-pf-fixed">
+		<head>
+			<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1"/>
+			<title>Elegadro Graph Based Legal Search Web POC</title>
+
+			<jsp:include page="favicon.jspx"/>
+			<jsp:include page="scripts.jspx"/>
+		</head>
+
+		<ui:body>
+
+			<ui:systemForm method="post">
+
+				<ui:registerScrollHandler/>
+
+				<jsp:include page="container/container.jspx"/>
+			</ui:systemForm>
+
+			<script type="text/javascript">
+                jQuery(document).ready(function() {
+                    // matchHeight the contents of each .card-pf and then the .card-pf itself
+                    jQuery(".row-cards-pf > [class*='col'] > .card-pf .card-pf-title").matchHeight();
+                    jQuery(".row-cards-pf > [class*='col'] > .card-pf > .card-pf-body").matchHeight();
+                    jQuery(".row-cards-pf > [class*='col'] > .card-pf > .card-pf-footer").matchHeight();
+                    jQuery(".row-cards-pf > [class*='col'] > .card-pf").matchHeight();
+
+                    // Initialize the vertical navigation
+                    jQuery().setupVerticalNavigation(true);
+                });
+			</script>
+
+		</ui:body>
+
+		</html>
+	</ui:widgetContext>
+</jsp:root>

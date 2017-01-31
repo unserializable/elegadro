@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--suppress SpellCheckingInspection -->
+<jsp:root
+	xmlns:jsp="http://java.sun.com/JSP/Page"
+	xmlns:ui="http://araneaframework.org/tag-library/standard"
+	version="2.0">
+
+    <ui:importStyles group="calendar"/>
+    <ui:importStyles group="patternfly"/>
+	<!--<ui:importStyles group="smm" media="screen"/>-->
+
+    <ui:importScripts group="core"/>
+
+	<!-- add a tree code -->
+	<script type="text/javascript">
+<![CDATA[
+var AraneaTree = {
+  toggleNode: function(element) {
+    return this.action(element, 'toggle');
+  },
+
+  displayAction: function(element, actionId, actionParam, onComplete, options) {
+    return this.action(element, actionId, 'display', actionParam, onComplete, options);
+  },
+
+  action: function(element, actionId, scopedActionTarget, actionParam, onComplete, options) {
+    var treeNode = this.getSurroundingTreeOrNode(element);
+    var tree = this.getSurroundingTree(treeNode);
+    var sync = !tree.hasAttribute('arn-tree-sync') || tree.readAttribute('arn-tree-sync').toLowerCase() != 'false';
+    var fullActionTarget = scopedActionTarget ? treeNode.id + '.' + scopedActionTarget : treeNode.id;
+    var actionCallback = this.getUpdateFunction(treeNode.id, onComplete);
+    _ap.action(tree, actionId, fullActionTarget, actionParam, actionCallback, options, sync);
+    return false;
+  },
+
+  // Returns LI that is Aranea tree node or UL that is Aranea tree and surrounds given HTML element.
+  getSurroundingTreeOrNode: function(element) {
+    element = $(element);
+    do {
+      if (Element.hasClassName(element, 'aranea-tree-node') || Element.hasClassName(element, 'aranea-tree')) {
+        return element;
+      }
+      element = element.parentNode;
+    } while (element);
+    return null;
+  },
+
+  // Returns UL that is Aranea tree and surrounds given HTML element.
+  getSurroundingTree: function(element) {
+    element = $(element);
+    do {
+      if (Element.hasClassName(element, 'aranea-tree')) {
+        return element;
+      }
+      element = element.parentNode;
+    } while (element);
+    return null;
+  },
+
+  getUpdateFunction: function(treeNodeId, onComplete) {
+    return function(request, response) {
+      // TODO handle non-200 responses
+      var element = $(treeNodeId);
+      var parentElement = element.up();
+      if (Element.hasClassName(element, 'aranea-tree')) {
+        Element.replace(element, request.responseText);
+      } else {
+        Element.update(element, request.responseText);
+      }
+      Behaviour.applyToElement(parentElement);
+      if (onComplete) {
+        onComplete(request, response);
+      }
+    };
+  }
+
+};
+]]></script>
+
+	<ui:importScripts group="scriptaculous"/>
+	<ui:importScripts group="calendar_et"/>
+	<ui:importScripts file="js/aranea/src/aranea-popups.js"/>
+
+	<ui:importScripts group="jquery"/>
+	<ui:importScripts group="jquery.matchHeight"/>
+	<script type="text/javascript">var jq_no_conflict = jQuery.noConflict();</script>
+	<ui:importScripts group="bootstrap"/>
+	<ui:importScripts group="patternfly"/>
+
+<script type="text/javascript"><![CDATA[
+var prgFor = function(widgetId, delay) {
+    return function() {
+        var applyNewValue = function (pct) {
+            var npg = '' + pct + '%';
+            var pgSpan = $('' + widgetId + '-progspan');
+            if (pgSpan.innerHTML == npg)
+                return;
+            pgSpan.innerHTML = npg;
+            var pgBar = $('' + widgetId + '-progress-bar');
+            pgBar.setAttribute('aria-valuenow', '' + pct);
+            pgBar.setStyle('width: ' + pct + "%;");
+        };
+
+        var fa = function (ac) {
+            return function () {
+                araneaPage().action(null, "pr", widgetId, null, ac, {}, false, {});
+            };
+        };
+
+        var actionCallback = function (data) {
+            var drp = data.responseText;
+            try {
+                var dp = JSON.parse(drp);
+                applyNewValue(dp.done);
+                if (dp.done != 100) {
+                    try {
+                        setTimeout(fa(actionCallback), delay);
+                    } catch (darn) {
+                        console.log('Progress schedule failed ' + darn);
+                    }
+                }
+            } catch (e) {
+                console.log('Progress cb err ' + e);
+            }
+        };
+        fa(actionCallback)();
+    };
+};
+]]></script>
+
+    <style type="text/css" media="screen">
+        #aranea-loading-message {
+            position: fixed;
+            top: 0;
+            right: 0;
+            color: white;
+            background-color: #e01601;
+            border: 1px solid black;
+            padding: 10px;
+            font-family: Arial, Helvetica, sans-serif;
+            font-weight: bold;
+            font-size: 11px;
+            white-space: nowrap;
+        }
+
+        /* Upper is from aranea.css */
+    </style>
+
+</jsp:root>
