@@ -63,6 +63,9 @@ public class RawIuraSearchServiceImpl implements RawIuraSearchService {
             return Collections.emptyList();
 
         String qs = SearchUtil.toLawParagraphQueryString(lpSearch);
+        if (log.isTraceEnabled()) {
+            log.trace("Executing query " + qs);
+        }
 
         List<Path> paths = new LinkedList<>();
         try (Session session = neo.session()) {

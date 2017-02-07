@@ -2,7 +2,7 @@ package org.elegadro.rt.service.law;
 
 import org.elegadro.error.UncompliantVmError;
 import org.eclipse.jetty.client.api.ContentResponse;
-import org.elegadro.actronym.Actronym;
+import org.elegadro.iota.rt.actronym.Actronym;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;

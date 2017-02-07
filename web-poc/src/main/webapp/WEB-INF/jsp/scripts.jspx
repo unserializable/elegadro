@@ -7,7 +7,6 @@
 
     <ui:importStyles group="calendar"/>
     <ui:importStyles group="patternfly"/>
-	<!--<ui:importStyles group="smm" media="screen"/>-->
 
     <ui:importScripts group="core"/>
 
@@ -71,21 +70,25 @@ var AraneaTree = {
       if (onComplete) {
         onComplete(request, response);
       }
+
+      if (elegadroMark) {
+          elegadroMark();
+	  }
     };
   }
-
 };
 ]]></script>
 
 	<ui:importScripts group="scriptaculous"/>
 	<ui:importScripts group="calendar_et"/>
-	<ui:importScripts file="js/aranea/src/aranea-popups.js"/>
 
 	<ui:importScripts group="jquery"/>
 	<ui:importScripts group="jquery.matchHeight"/>
 	<script type="text/javascript">var jq_no_conflict = jQuery.noConflict();</script>
 	<ui:importScripts group="bootstrap"/>
 	<ui:importScripts group="patternfly"/>
+	<ui:importScripts file="js/behaviour/behaviour.js" />
+	<ui:importScripts group="mark"/>
 
 <script type="text/javascript"><![CDATA[
 var prgFor = function(widgetId, delay) {
@@ -144,6 +147,13 @@ var prgFor = function(widgetId, delay) {
         }
 
         /* Upper is from aranea.css */
+    </style>
+
+	<style type="text/css" media="screen">
+        mark {
+            background-color: #0088ce;
+            padding: 0;
+        }
     </style>
 
 </jsp:root>

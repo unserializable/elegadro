@@ -9,7 +9,6 @@
         version="2.0">
 
     <ui:widgetContext>
-
         <div class="row">
             <div class="form-horizontal">
 
@@ -40,6 +39,22 @@
                 </div>
             </div>
         </c:if>
+
+    <c:if test="${null ne widget.searchString}">
+        <script type="text/javascript">
+             var elegadro_ss = "${widget.searchString}";
+        <![CDATA[
+            var emi = new Mark(document.querySelector(".aranea-tree"));
+            var elegadroMark = function() {
+                emi.unmark({
+                    done: function () {
+                      emi.mark(elegadro_ss);
+                    }
+                });
+            };
+            araneaPage().addClientLoadEvent(elegadroMark);
+        ]]></script>
+    </c:if>
 
     </ui:widgetContext>
 </jsp:root>

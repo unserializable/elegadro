@@ -8,14 +8,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 
 import javax.annotation.PreDestroy;
 
 /**
  * @author Taimo Peelo
  */
-@Profile("persistent")
 @Configuration
 @ComponentScan(basePackageClasses = {
     /* File system persistence */
@@ -23,9 +21,9 @@ import javax.annotation.PreDestroy;
 })
 public class PersistenceConfiguration {
     // Neo4J
-    private @Value("${elegadro.neo4j.uri}") String neo4jUri;
-    private @Value("${elegadro.neo4j.user.name}") String neo4jUserName;
-    private @Value("${elegadro.neo4j.user.password}") String neo4jUserPassword;
+    private @Value("${elegadro.neo4j.uri:bolt://localhost:7687}") String neo4jUri;
+    private @Value("${elegadro.neo4j.user.name:elegadro}") String neo4jUserName;
+    private @Value("${elegadro.neo4j.user.password:ele}") String neo4jUserPassword;
 
     @PreDestroy
     public void perstroy() {

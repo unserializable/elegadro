@@ -3,7 +3,7 @@ package org.elegadro.test;
 import org.elegadro.rt.search.LawParagraphSearch;
 import org.junit.Assert;
 import org.junit.Test;
-import org.elegadro.actronym.Actronym;
+import org.elegadro.iota.rt.actronym.Actronym;
 
 import java.util.List;
 

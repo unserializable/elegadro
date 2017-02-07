@@ -1,6 +1,6 @@
 package org.elegadro.poc.web.riik.tree.display;
 
-import org.elegadro.rt.legal.LegalParticle;
+import org.elegadro.iota.legal.LegalParticle;
 
 /**
  * @author Taimo Peelo

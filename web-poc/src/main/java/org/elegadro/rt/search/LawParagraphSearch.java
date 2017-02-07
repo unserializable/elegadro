@@ -1,7 +1,7 @@
 package org.elegadro.rt.search;
 
 import lombok.Getter;
-import org.elegadro.actronym.Actronym;
+import org.elegadro.iota.rt.actronym.Actronym;
 
 /**
  * @author Taimo Peelo

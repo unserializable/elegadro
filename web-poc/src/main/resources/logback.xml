@@ -15,32 +15,12 @@
         <appender-ref ref="STDOUT" />
     </logger>
 
-    <logger name="org.springframework.jdbc.core" level="INFO" additivity="false">
+    <logger name="org.elegadro.poc.web.riik" level="debug" additivity="false">
         <appender-ref ref="STDOUT" />
     </logger>
 
-    <logger name="com.unserializable.smm" level="DEBUG" additivity="false">
+    <logger name="org.elegadro.rt.service.law.impl" level="debug" additivity="false">
         <appender-ref ref="STDOUT" />
     </logger>
-
-    <logger name="org.eclipse.jetty.client" level="INFO" additivity="false">
-        <appender-ref ref="STDOUT" />
-    </logger>
-
-    <logger name="org.jooq" level="TRACE" additivity="false">
-        <appender-ref ref="STDOUT" />
-    </logger>
-
-
-    <!-- Very verbose Spring bean creation log: -->
-    <!--
-    <logger name="org.springframework.beans.factory.support.DefaultListableBeanFactory" level="DEBUG" additivity="false">
-        <appender-ref ref="STDOUT" />
-    </logger>
-    -->
-
-    <!--<logger name="org.eclipse.jetty.client" level="DEBUG" additivity="false">-->
-        <!--<appender-ref ref="STDOUT" />-->
-    <!--</logger>-->
 
 </configuration>

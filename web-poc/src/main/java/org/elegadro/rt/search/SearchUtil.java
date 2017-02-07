@@ -1,7 +1,7 @@
 package org.elegadro.rt.search;
 
 import lombok.extern.slf4j.Slf4j;
-import org.elegadro.actronym.Actronym;
+import org.elegadro.iota.rt.actronym.Actronym;
 
 import java.util.*;
 import java.util.regex.Matcher;

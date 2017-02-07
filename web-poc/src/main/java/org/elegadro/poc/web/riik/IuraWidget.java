@@ -1,17 +1,7 @@
 package org.elegadro.poc.web.riik;
 
-import org.elegadro.parser.util.rt.neo4j.GraphPathUtil;
-import org.elegadro.rt.legal.LegalMolecul;
-import org.elegadro.rt.legal.LegalParticle;
-import org.elegadro.rt.legal.impl.Seadus;
-import org.elegadro.rt.search.LawParagraphSearch;
-import org.elegadro.rt.search.SearchUtil;
-import org.elegadro.rt.service.law.RawIuraSearchService;
-import org.elegadro.poc.web.base.BaseAppUIWidget;
-import org.elegadro.poc.web.riik.tree.display.LegalMoleculDisplayWidget;
-import org.elegadro.poc.web.riik.tree.display.LegalParticleDisplayWidget;
-import org.elegadro.poc.web.riik.tree.display.LegalTreeDisplay;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.araneaframework.InputData;
 import org.araneaframework.core.StandardEventListener;
 import org.araneaframework.uilib.form.FormWidget;
@@ -22,6 +12,17 @@ import org.araneaframework.uilib.tree.TreeDataProvider;
 import org.araneaframework.uilib.tree.TreeNodeContext;
 import org.araneaframework.uilib.tree.TreeNodeWidget;
 import org.araneaframework.uilib.tree.TreeWidget;
+import org.elegadro.iota.legal.LegalMolecul;
+import org.elegadro.iota.legal.LegalParticle;
+import org.elegadro.iota.legal.impl.Seadus;
+import org.elegadro.neo4j.util.GraphPathUtil;
+import org.elegadro.poc.web.base.BaseAppUIWidget;
+import org.elegadro.poc.web.riik.tree.display.LegalMoleculDisplayWidget;
+import org.elegadro.poc.web.riik.tree.display.LegalParticleDisplayWidget;
+import org.elegadro.poc.web.riik.tree.display.LegalTreeDisplay;
+import org.elegadro.rt.search.LawParagraphSearch;
+import org.elegadro.rt.search.SearchUtil;
+import org.elegadro.rt.service.law.RawIuraSearchService;
 import org.neo4j.driver.v1.types.Path;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -29,15 +30,22 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import static java.util.Collections.singletonMap;
+import static java.util.stream.Collectors.toList;
+
 /**
  * @author Taimo Peelo
  */
 @Slf4j
 public class IuraWidget extends BaseAppUIWidget {
+    private static final Comparator<Map.Entry<Seadus, Integer>>
+        DESCENDING = Comparator.<Map.Entry<Seadus, Integer>>comparingInt(e -> e.getValue()).reversed();
+
     @Autowired
     private RawIuraSearchService rawIuraSS;
 
     private FormWidget searchForm;
+    private String searchString;
 
     @Override
     protected void init() throws Exception {
@@ -50,6 +58,10 @@ public class IuraWidget extends BaseAppUIWidget {
         addEventListener("ds", new SearchListener());
     }
 
+    public String getSearchString() {
+        return StringEscapeUtils.escapeJavaScript(searchString);
+    }
+
     private class SearchListener extends StandardEventListener {
         @Override
         public void processEvent(String eventId, String eventParam, InputData input) throws Exception {
@@ -57,11 +69,14 @@ public class IuraWidget extends BaseAppUIWidget {
                 String s = (String) searchForm.getValueByFullName("s");
                 s = s.trim();
 
-                log.debug(" search string was '" + s + "'");
+                if (log.isDebugEnabled()) {
+                    log.debug(" search string was '" + s + "'");
+                }
 
                 List<LawParagraphSearch> lawParagraphSearches = SearchUtil.toLawParagraphSearch(s);
                 List<Path> resultPaths;
                 if (!lawParagraphSearches.isEmpty()) {
+                    searchString = null;
                     log.debug("Concrete law paragraph search to be executed ");
                     if (log.isTraceEnabled()) {
                         log.trace(String.valueOf(lawParagraphSearches));
@@ -69,12 +84,13 @@ public class IuraWidget extends BaseAppUIWidget {
 
                     resultPaths = rawIuraSS.lawParagraphSearch(lawParagraphSearches);
                 } else {
+                    searchString = s;
                     resultPaths = rawIuraSS.textSearch(s);
                 }
 
-                List<Seadus> matches = pathsAsLaw(resultPaths);
+                List<Seadus> matches = pathsAsLaw(resultPaths, !lawParagraphSearches.isEmpty());
                 // TODO: conditional (none if no matches)
-                TreeWidget child = new TreeWidget(new SearchResultProvider(matches));
+                TreeWidget child = new TreeWidget(new SearchResultProvider(matches, !lawParagraphSearches.isEmpty()));
                 child.setUseActions(true);
                 child.setCollapsed(true);
                 child.setRemoveChildrenOnCollapse(false);
@@ -82,22 +98,35 @@ public class IuraWidget extends BaseAppUIWidget {
             }
         }
 
-        private List<Seadus> pathsAsLaw(List<Path> paths) {
+        private List<Seadus> pathsAsLaw(List<Path> paths, boolean concretePgSearch) {
             Set<?> legalParticles = GraphPathUtil.pathsToParticles(paths);
             for (Object lp: legalParticles) {
                 if (!(lp instanceof Seadus))
                     throw new IllegalStateException();
             }
 
-            return new ArrayList(legalParticles);
+            if (concretePgSearch)
+                return new ArrayList(legalParticles);
+
+            List<Map.Entry<Seadus, Integer>> results = legalParticles.stream()
+                .map(lp -> (Seadus) lp)
+                .map(lp -> singletonMap(lp, lp.particleCount()).entrySet().iterator().next())
+                .collect(toList());
+
+            // sort the results so that laws with more matches for search are shown first
+            results.sort(DESCENDING);
+
+            return new ArrayList(results.stream().map(e -> e.getKey()).collect(toList()));
         }
     }
 
     private static class SearchResultProvider implements TreeDataProvider {
         private Collection<? extends LegalParticle> root;
+        private boolean concretePgSearch;
 
-        public SearchResultProvider(Collection<? extends LegalParticle> root) {
+        public SearchResultProvider(Collection<? extends LegalParticle> root, boolean concretePgSearch) {
             this.root = root;
+            this.concretePgSearch = concretePgSearch;
         }
 
         @Override
@@ -105,7 +134,7 @@ public class IuraWidget extends BaseAppUIWidget {
             if (parent instanceof TreeWidget) // root!
                 return root
                     .stream()
-                    .map(SearchResultProvider::treeNodeWidgetFor)
+                    .map(x -> SearchResultProvider.treeNodeWidgetFor(x, concretePgSearch, root.size() == 1))
                     .collect(Collectors.toCollection(() -> new ArrayList<>(root.size())));
 
             LegalTreeDisplay ldp = (LegalTreeDisplay) parent.getDisplayWidget();
@@ -116,7 +145,7 @@ public class IuraWidget extends BaseAppUIWidget {
             LegalMolecul parentMolecul = (LegalMolecul) parentLegalMatter;
 
             return StreamSupport.stream(parentMolecul.getLegalParticles().spliterator(), false)
-                .map(SearchResultProvider::treeNodeWidgetFor)
+                .map(x -> SearchResultProvider.treeNodeWidgetFor(x, concretePgSearch, root.size() == 1))
                 .collect(Collectors.toCollection(() -> new ArrayList<>()));
         }
 
@@ -135,8 +164,17 @@ public class IuraWidget extends BaseAppUIWidget {
             return parentMolecul.getLegalParticles().iterator().hasNext();
         }
 
-        private static TreeNodeWidget treeNodeWidgetFor(LegalParticle lp) {
-            TreeNodeWidget treeNodeWidget = new TreeNodeWidget(displayWidgetFor(lp));
+        private static TreeNodeWidget treeNodeWidgetFor(LegalParticle lp, boolean concretePgSearch, boolean singleResult) {
+            TreeNodeWidget treeNodeWidget = new TreeNodeWidget(displayWidgetFor(lp)) {
+                @Override
+                protected void init() throws Exception {
+                    super.init();
+                    boolean hasChildren = (lp instanceof LegalMolecul && ((LegalMolecul) lp).getLegalParticles().iterator().hasNext());
+                    boolean isSeadus = lp.getParticleName().charAt(0) == 'S';
+                    boolean expanded = (hasChildren && (concretePgSearch || singleResult || !isSeadus));
+                    setCollapsed(!expanded);
+                }
+            };
             return treeNodeWidget;
         }
 

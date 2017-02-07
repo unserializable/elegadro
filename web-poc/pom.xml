@@ -69,6 +69,18 @@
 	<dependencies>
         <dependency>
             <groupId>org.elegadro</groupId>
+            <artifactId>iota</artifactId>
+            <version>0.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.elegadro</groupId>
+            <artifactId>iota-parser</artifactId>
+            <version>0.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.elegadro</groupId>
             <artifactId>tyvi-law</artifactId>
             <version>0.2-SNAPSHOT</version>
         </dependency>
@@ -268,7 +280,8 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.16.10</version>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>

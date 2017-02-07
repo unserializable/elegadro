@@ -32,6 +32,7 @@
 
         <jool.version>0.9.12</jool.version>
         <joor.version>0.9.6</joor.version>
+        <lombok.version>1.16.12</lombok.version>
 
         <applibs.folder>${project.basedir}/.applibs</applibs.folder>
 
@@ -50,6 +51,8 @@
         <module>tyvi-law</module>
         <module>redpill</module>
         <module>web-poc</module>
+        <module>iota</module>
+        <module>iota-parser</module>
     </modules>
 
     <build>

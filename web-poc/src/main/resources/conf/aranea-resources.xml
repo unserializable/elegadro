@@ -28,6 +28,10 @@
         <file path="bs/js/bootstrap.js" />
     </files>
 
+    <files content-type="text/javascript" group="mark.js">
+        <file path="markjs/mark.js" />
+    </files>
+
     <!--
         Other scripts that should not be omnipresent but which must be
         accessible to fileimporter.
