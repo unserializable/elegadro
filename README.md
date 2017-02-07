@@ -3,7 +3,7 @@
 ## Quick start
 
 For instructions about running Elegadro PoC locally, skip to
-[Local execution](#Local-execution) section.
+[Local execution](#local-execution) section.
 
 For online try-out of Elegadro web front-end PoC, one can try visiting
 temporary [web-site](http://elegadro.timedrops.org/) of Elegadro web-poc.
