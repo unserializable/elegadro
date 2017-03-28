@@ -5,15 +5,15 @@
 For instructions about running Elegadro PoC locally, skip to
 [Local execution](#local-execution) section.
 
-For online try-out of Elegadro web front-end PoC, one can try visiting
-temporary [web-site](http://elegadro.timedrops.org/) of Elegadro web-poc.
+For online tryout of Elegadro web front-end PoC, one can try visiting
+temporary [website](http://elegadro.timedrops.org/) of Elegadro web-poc.
 
 ## Concepts
 Elegadro is e-legal PoC with legal documents (currently Estonian Laws) stored
 in a [graph](https://en.wikipedia.org/wiki/Graph_%28discrete_mathematics%29)
 database [Neo4J](https://neo4j.com/). Compared to relational databases, graphs
 are still neatly structured, but relationships between vertices can be defined
-more flexibly. This is beneficial since lawyers reference over many different
+more flexibly. This is beneficial, for lawyers reference over many different
 sources and documents, producing 'ad-hoc' relationships that are tiresome to
 model in the relational databases and result in overabundance of [relational
 joins](https://en.wikipedia.org/wiki/Relational_database#Relational_operations)
@@ -48,7 +48,7 @@ _simple text searches_.
 
 At the beginning of the project,  idea was entertained of scraping legal
 content from [Riigi Teataja (RT)](https://www.riigiteataja.ee) website HTML
-representations of legal acts, considered this advantegeous as RT content
+representations of legal acts, considered this advantageous as RT content
 processor appears to have some workarounds in place to display erroneous quirks
 of legal source XML files that are available both from Riigi Teataja ('Laadi
 alla' -> 'XML failina') and from
@@ -103,17 +103,17 @@ which provide following features:
 
 ## Functional artifacts
 
-Notable non-runnable and non-deployabe artifacts included in the PoC are:
+Notable non-runnable and non-deployable artifacts included in the PoC are:
 
 * `tyvi-law` -- XML Schema compiled to visitable Java types
 * `iota` -- Java type definitions for legal act representations
 * `iota-parser` -- tyviakt XML to iota representation conversion tools
 
 At the moment of writing, these three artifacts are, to the best of my
-knowledge, only open source Jave libraries available for processing Estonian
+knowledge, only open source Java libraries available for processing Estonian
 legal acts.
 
-## Extansion and expansion
+## Extension and expansion
 * With extensions, the legal iotas can be made to fully support  _määrus_,
   _muutmismäärus_, _muutmisseadus_, _riigikogu otsus_ and possibly other
   _structured_ legal act types.
