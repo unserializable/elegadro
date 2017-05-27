@@ -23,6 +23,10 @@ public class Trinity {
         return "https://www.riigiteataja.ee/akt/"  + act.getActId() + ".xml";
     }
 
+    public static String actEnTrnXmlUrl(Actronym act) {
+        return "https://www.riigiteataja.ee/en/tolge/xml/"  + act.getTrnId();
+    }
+
     public static boolean bringRemoteLaw(Actronym actronym, Path lawPath) {
         String actXmlWebUrl = actXmlUrl(actronym);
 
