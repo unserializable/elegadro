@@ -90,47 +90,6 @@ var AraneaTree = {
 	<ui:importScripts file="js/behaviour/behaviour.js" />
 	<ui:importScripts group="mark"/>
 
-<script type="text/javascript"><![CDATA[
-var prgFor = function(widgetId, delay) {
-    return function() {
-        var applyNewValue = function (pct) {
-            var npg = '' + pct + '%';
-            var pgSpan = $('' + widgetId + '-progspan');
-            if (pgSpan.innerHTML == npg)
-                return;
-            pgSpan.innerHTML = npg;
-            var pgBar = $('' + widgetId + '-progress-bar');
-            pgBar.setAttribute('aria-valuenow', '' + pct);
-            pgBar.setStyle('width: ' + pct + "%;");
-        };
-
-        var fa = function (ac) {
-            return function () {
-                araneaPage().action(null, "pr", widgetId, null, ac, {}, false, {});
-            };
-        };
-
-        var actionCallback = function (data) {
-            var drp = data.responseText;
-            try {
-                var dp = JSON.parse(drp);
-                applyNewValue(dp.done);
-                if (dp.done != 100) {
-                    try {
-                        setTimeout(fa(actionCallback), delay);
-                    } catch (darn) {
-                        console.log('Progress schedule failed ' + darn);
-                    }
-                }
-            } catch (e) {
-                console.log('Progress cb err ' + e);
-            }
-        };
-        fa(actionCallback)();
-    };
-};
-]]></script>
-
     <style type="text/css" media="screen">
         #aranea-loading-message {
             position: fixed;
