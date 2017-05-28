@@ -29,6 +29,7 @@ public class RunNeoRun {
     private static final Path WRITABLE_PATH;
 
     private static final Path ELEGADRO_RT_XML_SAVE_PATH;
+    private static final Path ELEGADRO_RT_XML_EN_SAVE_PATH;
     private static final Path ELEGADRO_NEO_DATADIR;
 
     private enum RelTypes implements RelationshipType {
@@ -51,6 +52,7 @@ public class RunNeoRun {
         System.out.println("Detected writable path '" + WRITABLE_PATH + "'.");
 
         ELEGADRO_RT_XML_SAVE_PATH = WRITABLE_PATH.resolve("elegadro/rt-law-xml");
+        ELEGADRO_RT_XML_EN_SAVE_PATH = ELEGADRO_RT_XML_SAVE_PATH.resolve("tr-en");
         ELEGADRO_NEO_DATADIR = WRITABLE_PATH.resolve("elegadro/neo-data");
     }
 
@@ -163,11 +165,8 @@ public class RunNeoRun {
         System.out.print("Creating indexes ...");
         for (LawParticleEnum lpe: LawParticleEnum.values()) {
             try (Transaction tx = graphDB.beginTx()) {
-                Result qr = graphDB.execute("CREATE INDEX ON :" + lpe.getLabel() + "(text)");
-                qr.forEachRemaining(m -> {
-                    System.out.println(m);
-                });
-
+                graphDB.execute("CREATE INDEX ON :" + lpe.getLabel() + "(text)");
+                graphDB.execute("CREATE INDEX ON :" + lpe.getLabel() + "(tr_en)");
                 tx.success();
             }
             System.out.print(" " + lpe.getLabel());
@@ -175,11 +174,11 @@ public class RunNeoRun {
         System.out.println();
     }
 
-    private static void persistTheLaw(GraphDatabaseService graphDB, Seadus seadus) {
-        System.out.print("Persisting into graphdb ... ");
+    private static void persistTheLaw(GraphDatabaseService graphDB, Seadus et, Seadus en) {
+        System.out.print("Persisting into graphdb  " + ((en != null) ? "(ET+EN)" : "(ET)") + " ... ");
         long start = System.nanoTime();
         try (Transaction tx = graphDB.beginTx()) {
-            legalMolecul2Node(graphDB, seadus);
+            legalMolecul2Node(graphDB, et, en);
             tx.success();
         }
         System.out.printf("done %3.3gs\n", (System.nanoTime()-start)/1000.0/1000.0/1000.0);
@@ -190,25 +189,60 @@ public class RunNeoRun {
             ensureRtXmlSavePath(true);
         }
 
-        for (Actronym actronym: lawsNotPresent) {
-            Seadus seadus = bringTheLaw(actronym);
-            if (seadus != null)
-                System.out.println("Acquired " + actronym.getActronym() + " ('" + actronym.getExpanym() + "')");
-            else
-                System.err.println("!" + actronym.getActronym() + " ('" + actronym.getExpanym() + "') will not be inserted.");
+        int total = lawsNotPresent.size(), etc = 0, enc = 0;
 
-            if (seadus != null)
-                persistTheLaw(graphDB, seadus);
+        for (Actronym actronym: lawsNotPresent) {
+            Seadus seadusET = bringTheLawET(actronym);
+            if (seadusET == null) {
+                System.err.println("!" + actronym.getActronym() + " ('" + actronym.getExpanym() + "') will not be inserted.");
+                continue;
+            }
+            System.out.println("Acquired " + actronym.getActronym() + " ('" + actronym.getExpanym() + "')");
+
+            if (null == actronym.getTrnId()) {
+                System.out.println("!" + actronym.getActronym() + " does not have EN translation available at RT.");
+                persistTheLaw(graphDB, seadusET, null);
+                etc++;
+                continue;
+            }
+
+            Seadus seadusEN = bringTheLawEN(actronym);
+            if (seadusEN == null) {
+                System.out.println("!" + actronym.getActronym() + " could not fetch EN translation available at RT.");
+                persistTheLaw(graphDB, seadusET, null);
+                etc++;
+                continue;
+            }
+
+            System.out.println("Acquired EN translation for " + actronym.getActronym());
+            boolean et_en_match = haveStructuralMatch(new LinkedList<>(), seadusET, seadusEN);
+            if (!et_en_match) {
+                System.err.println("! Due to structural mismatch(es), EN translations for " + actronym.getActronym() + " will NOT be inserted.");
+                persistTheLaw(graphDB, seadusET, null);
+                etc++;
+                continue;
+            }
+
+            persistTheLaw(graphDB, seadusET, seadusEN);
+            enc++;
         }
+
+        if (!lawsNotPresent.isEmpty())
+            System.out.println("Inserted " + etc + " acts (ET) and " + enc + " acts (ET+EN), "+ (etc+enc) +"/" + total +" looked for.");
     }
 
-    private static Seadus bringTheLaw(Actronym actronym) {
-        // fetch the xml for fun and profit...
-        // ... UrlConnections should suffice.
-        // then apply
-        String localFileName = actronym.getActId() + ".xml";
+    private static Seadus bringTheLawET(Actronym actronym) {
+        String localFileName = actronym.getActronym() + ".xml";
         Path localFilePath = ELEGADRO_RT_XML_SAVE_PATH.resolve(localFileName);
-        if (!Trinity.bringRemoteLaw(actronym, localFilePath))
+        if (!Trinity.bringRemoteLawET(actronym, localFilePath))
+            return null;
+        return Trinity.bringLocalLaw(localFilePath);
+    }
+
+    private static Seadus bringTheLawEN(Actronym actronym) {
+        String localFileName = actronym.getActronym() + ".xml";
+        Path localFilePath = ELEGADRO_RT_XML_EN_SAVE_PATH.resolve(localFileName);
+        if (!Trinity.bringRemoteLawEN(actronym, localFilePath))
             return null;
         return Trinity.bringLocalLaw(localFilePath);
     }
@@ -236,30 +270,100 @@ public class RunNeoRun {
     // INITIAL NODE POPULATION METHODS
     //
 
-    private static Node legalMolecul2Node(GraphDatabaseService graphDB, LegalMolecul mol) {
-        Node molNode = graphDB.createNode(Label.label(mol.getParticleName()));
-        molNode.setProperty("text", mol.getLegalText());
-        if (mol.getParticleNumber() != null) {
-            appendLegalNumberToNode(mol.getParticleNumber(), molNode);
+    private static String toParentDbgString(Deque<LegalMolecul> parents) {
+        StringBuilder sb = new StringBuilder();
+        Iterator<LegalMolecul> it = parents.descendingIterator();
+        it.forEachRemaining(p -> {
+            if (LawParticleEnum.SEADUS.getLabel().equals(p.getParticleName()))
+                sb.append(p.getLegalText()).append(' ');
+            else
+                sb.append(p.getParticleNumber()).append(' ').append(p.getParticleName()).append(' ');
+        });
+        return sb.toString();
+    }
+
+    private static boolean haveSameTypeAndLegalNumber(Deque<LegalMolecul> parents, LegalParticle p1, LegalParticle p2) {
+        boolean result = true;
+        String n1 = p1.getParticleName(), n2 = p2.getParticleName();
+        if (!n1.equals(n2)) {
+            System.err.println("Particle type mismatch: " + toParentDbgString(parents) + " '" + n1 + "' != '" + n2 + "'");
+            result = false;
         }
 
-        mol.getLegalParticles().forEach(p -> {
+        LegalNumber p1n = p1.getParticleNumber(), p2n = p2.getParticleNumber();
+        // Need to cut slack for the cases where just roman/arabic representation of the numeral is different,
+        // as happens to be somewhat of a convention between Estonian/English acts...
+        // e.g. LegalNumber{isRoman=T, num=2, sup=null} & LegalNumber{isRoman=F, num=2, sup=null}
+        if (!((p1n == p2n) || (p1n != null && 0 == p1n.compareTo(p2n)))) {
+            String v1 = (p1n != null) ? p1n.toDebugString() : null;
+            String v2 = (p2n != null) ? p2n.toDebugString() : null;
+            System.err.println("Particle number mismatch " + toParentDbgString(parents) + " at " + n1 + ": '" + v1  + "' != '" + v2 + "'");
+            result = false;
+        }
+
+        return result;
+    }
+
+    private static boolean haveStructuralMatch(Deque<LegalMolecul> parents, LegalMolecul et, LegalMolecul en) {
+        boolean result = true;
+        if (!haveSameTypeAndLegalNumber(parents, et, en))
+            result = false;
+
+        Iterator<LegalParticle> iET = et.getLegalParticles().iterator();
+        Iterator<LegalParticle> iEN = en.getLegalParticles().iterator();
+
+        parents.push(et);
+        while (iET.hasNext()) {
+            if (!iEN.hasNext())
+                return false;
+
+            LegalParticle pET = iET.next(), pEN = iEN.next();
+            if (pET instanceof LegalMolecul && !haveStructuralMatch(parents, (LegalMolecul) pET, (LegalMolecul) pEN))
+                result = false;
+            else if (!haveStructuralMatch(parents, pET, pEN))
+                result = false;
+        }
+        parents.pop();
+
+        return result;
+    }
+
+    private static boolean haveStructuralMatch(Deque<LegalMolecul> parents, LegalParticle et, LegalParticle en) {
+        return haveSameTypeAndLegalNumber(parents, et, en);
+    }
+
+    private static Node legalMolecul2Node(GraphDatabaseService graphDB, LegalMolecul molET, LegalMolecul molEN) {
+        Node molNode = graphDB.createNode(Label.label(molET.getParticleName()));
+        molNode.setProperty("text", molET.getLegalText());
+        if (molEN != null)
+            molNode.setProperty("tr_en", molEN.getLegalText());
+
+        if (molET.getParticleNumber() != null) {
+            appendLegalNumberToNode(molET.getParticleNumber(), molNode);
+        }
+
+        Iterator<LegalParticle> iET = molET.getLegalParticles().iterator();
+        Iterator<LegalParticle> iEN = (molEN != null) ? molEN.getLegalParticles().iterator() : null;
+        while (iET.hasNext()) {
             Node child;
-            if (p instanceof LegalMolecul) {
-                child = legalMolecul2Node(graphDB, (LegalMolecul) p);
+            LegalParticle pET = iET.next(), pEN = (molEN != null) ? iEN.next() : null;
+            if (pET instanceof LegalMolecul) {
+                child = legalMolecul2Node(graphDB, (LegalMolecul) pET, (LegalMolecul) pEN);
             } else {
-                child = legalParticle2Node(graphDB, p);
+                child = legalParticle2Node(graphDB, pET, pEN);
             }
 
             molNode.createRelationshipTo(child, RelTypes.HAS);
-        });
+        }
 
         return molNode;
     }
 
-    private static Node legalParticle2Node(GraphDatabaseService graphDB, LegalParticle particle) {
+    private static Node legalParticle2Node(GraphDatabaseService graphDB, LegalParticle particle, LegalParticle enTrParticle) {
         Node pNode = graphDB.createNode(Label.label(particle.getParticleName()));
         pNode.setProperty("text", particle.getLegalText());
+        if (enTrParticle != null)
+            pNode.setProperty("tr_en", enTrParticle.getLegalText());
 
         if (particle.getParticleNumber() != null) {
             appendLegalNumberToNode(particle.getParticleNumber(), pNode);
@@ -319,6 +423,7 @@ public class RunNeoRun {
     private static void ensureRtXmlSavePath(boolean exitOnFailure) {
         try {
             Files.createDirectories(ELEGADRO_RT_XML_SAVE_PATH);
+            Files.createDirectories(ELEGADRO_RT_XML_EN_SAVE_PATH);
         }  catch (IOException e) {
             e.printStackTrace(System.err);
             System.err.println("Could not write '" + ELEGADRO_RT_XML_SAVE_PATH + "', exiting.");

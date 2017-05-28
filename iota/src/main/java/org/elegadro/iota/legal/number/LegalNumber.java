@@ -8,6 +8,7 @@ import org.elegadro.iota.legal.number.util.RomanNumeralUtil;
 import java.io.Serializable;
 
 /**
+ * NB! This class has a natural ordering that is inconsistent with equals!
  * @author Taimo Peelo
  */
 @Getter
@@ -67,19 +68,29 @@ public final class LegalNumber implements Serializable, Comparable<LegalNumber> 
 
     @Override
     public int compareTo(LegalNumber o) {
+        if (o == null) {
+            return 1;
+        }
+
         Integer oNum = o.getNum();
         if (this.num == null) {
             return (oNum == null) ? 0 : -1;
         } else if (oNum == null) {
-            return -1;
+            return 1;
         }
 
         int dn = this.num - oNum;
         if (dn != 0)
             return dn;
 
+        String thisSup = this.sup;
+        if (thisSup != null && thisSup.isEmpty())
+            thisSup = null;
+
         String oSup = o.getSup();
-        if (this.sup == null) {
+        if (oSup != null && oSup.isEmpty())
+            oSup = null;
+        if (thisSup == null) {
             return (oSup == null) ? 0 : -1;
         } else if (oSup == null) {
             return 1;
@@ -90,9 +101,13 @@ public final class LegalNumber implements Serializable, Comparable<LegalNumber> 
 
     public String toDebugString() {
         final StringBuilder sb = new StringBuilder("LegalNumber{");
-        sb.append("isRoman=").append(isRoman);
+        sb.append("isRoman=").append(isRoman ? 'T' : 'F');
         sb.append(", num=").append(num);
-        sb.append(", sup='").append(sup).append('\'');
+        sb.append(", sup=");
+        if (sup == null)
+            sb.append("null");
+        else
+            sb.append('\'').append(sup).append('\'');
         sb.append('}');
         return sb.toString();
     }

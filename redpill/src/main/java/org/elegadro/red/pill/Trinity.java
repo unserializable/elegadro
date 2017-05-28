@@ -19,23 +19,29 @@ import java.util.Optional;
  * @author Taimo Peelo
  */
 public class Trinity {
-    public static String actXmlUrl(Actronym act) {
+    public static String actXmlUrlET(Actronym act) {
         return "https://www.riigiteataja.ee/akt/"  + act.getActId() + ".xml";
     }
 
-    public static String actEnTrnXmlUrl(Actronym act) {
+    public static String actXmlUrlEN(Actronym act) {
         return "https://www.riigiteataja.ee/en/tolge/xml/"  + act.getTrnId();
     }
 
-    public static boolean bringRemoteLaw(Actronym actronym, Path lawPath) {
-        String actXmlWebUrl = actXmlUrl(actronym);
+    public static boolean bringRemoteLawEN(Actronym actronym, Path lawPath) {
+        return fetchRemoteUrlToLocal(actronym, actXmlUrlEN(actronym), lawPath);
+    }
 
+    public static boolean bringRemoteLawET(Actronym actronym, Path lawPath) {
+        return fetchRemoteUrlToLocal(actronym, actXmlUrlET(actronym), lawPath);
+    }
+
+    private static boolean fetchRemoteUrlToLocal(Actronym actronym, String actXmlWebUrl, Path targetPath) {
         try {
             URL url = new URL(actXmlWebUrl);
             URLConnection conn = url.openConnection();
             InputStream inputStream = conn.getInputStream();
 
-            FileOutputStream outputStream = new FileOutputStream(lawPath.toFile());
+            FileOutputStream outputStream = new FileOutputStream(targetPath.toFile());
 
             byte[] buffer = new byte[4096];
             int bytesRead;
