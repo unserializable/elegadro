@@ -95,7 +95,7 @@ public final class LegalNumberUtil {
                 // Allow one case as 'consistent': where display number (knr) is empty and loige nr
                 // is equal to 1 -- such discrepancy arises because it is customary to not write lg
                 // nr when the whole pg (§) consists of just one loige.
-                if (!knr.isEmpty() && "1".equals(nr) && type instanceof LoigeType)
+                if (!(type instanceof LoigeType && "1".equals(nr) && knr.isEmpty()))
                     throw new IllegalStateException("Unhappystance: '" + knr + "' !!=  '" + nr + "'");
             }
         }
@@ -128,6 +128,8 @@ public final class LegalNumberUtil {
     }
 
     // Do ALLOW for cases like ('1. peatükk' vs '1'), ('§ 1.' vs '1'), ...
+    // Additionally ALLOW some ENGLISH translation specific prefixes, e..g 'Chapter 1' vs '1' etc
+    private static final String SECTION_NR_PREFIXES_EN = "(Chapter|Part|Division|Subdivision|Sub-subdivision)";
     private static boolean consistentNumbering(String kuvatavNr, String xmlNr) {
         kuvatavNr = kuvatavNr.trim();
 
@@ -142,6 +144,19 @@ public final class LegalNumberUtil {
         String punktNr = String.valueOf(xmlNr) + ")";
         if (kuvatavNr.equals(punktNr))
             return true;
+
+        String nrENprefixed = SECTION_NR_PREFIXES_EN + "\\s+" + Pattern.quote(String.valueOf(xmlNr));
+        if (kuvatavNr.matches(nrENprefixed))
+            return true;
+
+        // Be more lenient, English translators have been happy to mix and match Arabic and Roman numerals.
+        if (xmlNr.matches("\\d+")) {
+            Integer arabic = Integer.valueOf(xmlNr);
+            String roman = RomanNumeralUtil.decimalToRoman(arabic);
+            String romanNrENprefixed = SECTION_NR_PREFIXES_EN + "\\s+" + Pattern.quote(String.valueOf(roman));
+            if (kuvatavNr.matches(romanNrENprefixed))
+                return true;
+        }
 
         return false;
     }
