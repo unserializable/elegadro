@@ -83,6 +83,7 @@ public final class LegalNumberUtil {
     /** Extracts the legal particle or legal molecul number from {@code type}. */
     private static LegalNumber getLegalNumberFor(boolean expectedRoman, TypeID type, StringID str, String sup) {
         StringID kstrID = C_KUVATAV_NR.apply(type);
+        boolean unexpired = (str != null) ? !("0".equals(getKehtivFor(str))) : true;
         String knr = (kstrID != null) ? stringIDToString(kstrID) : null;
         String nr = (str != null) ? str.getValue() : null;
 
@@ -104,11 +105,11 @@ public final class LegalNumberUtil {
         if (nr != null && !nr.isEmpty() && !nr.matches("\\d+")) {
             Optional<Integer> optArabic = RomanNumeralUtil.romanToDecimal(nr);
             if (optArabic.isPresent())
-                return new LegalNumber(true, optArabic.get(), sup);
+                return new LegalNumber(true, optArabic.get(), sup, unexpired);
         }
 
         Integer pgNr = (nr != null && !nr.isEmpty()) ? Integer.parseInt(nr) : null;
-        return new LegalNumber(expectedRoman, pgNr, sup);
+        return new LegalNumber(expectedRoman, pgNr, sup, unexpired);
     }
 
     private static <T extends StringID> String getVormingFor(T t) {
@@ -121,6 +122,10 @@ public final class LegalNumberUtil {
 
     private static <T extends StringID> String getYlaindexFor(T t) {
         return C_YLAINDEX.apply(t);
+    }
+
+    private static <T extends StringID> String getKehtivFor(T t) {
+        return C_KEHTIV.apply(t);
     }
 
     private static boolean isRoman(String vorming) {
@@ -192,6 +197,11 @@ public final class LegalNumberUtil {
         Unchecked.function(c -> c.getMethod("getYlaIndeks"))
     );
 
+    /** Returns getKehtiv() method for given StringID. */
+    private static Function<Class<? extends StringID>, Method> M_KEHTIV = memoize(
+        Unchecked.function(c -> c.getMethod("getKehtiv"))
+    );
+
     private static Function<TypeID, StringID> C_KUVATAV_NR =
         Unchecked.function(t -> (StringID) M_KUVATAV_NR.apply(t.getClass()).invoke(t));
 
@@ -200,6 +210,9 @@ public final class LegalNumberUtil {
 
     private static Function<StringID, String> C_YLAINDEX =
         Unchecked.function(t -> (String) M_YLAINDEX.apply(t.getClass()).invoke(t));
+
+    private static Function<StringID, String> C_KEHTIV =
+        Unchecked.function(t -> (String) M_KEHTIV.apply(t.getClass()).invoke(t));
 
     private static <T, R> Function<T, R> memoize(final Function<T, R> function) {
         Map<T, R> cache = new ConcurrentHashMap<>();

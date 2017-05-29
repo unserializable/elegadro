@@ -41,7 +41,7 @@ public final class GraphNodeUtil {
 
         boolean bRoman = romanVal.isNull() ? false : romanVal.asBoolean();
 
-        return new LegalNumber(bRoman, iNum, sSup);
+        return new LegalNumber(bRoman, iNum, sSup, true); // Assume present node unexpired
     }
 
     /** Returns legal number from Neo4J graph node. */
@@ -50,6 +50,6 @@ public final class GraphNodeUtil {
         String supProp = (String) node.getProperty(LEGAL_SUPER_KEY, null);
         Boolean isRomanProp = (Boolean) node.getProperty(LEGAL_ROMAN_KEY, Boolean.FALSE);
 
-        return new LegalNumber(isRomanProp.booleanValue(), numProp, supProp);
+        return new LegalNumber(isRomanProp.booleanValue(), numProp, supProp, true); // Assume present node unexpired
     }
 }

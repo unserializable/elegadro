@@ -15,8 +15,8 @@ import java.util.TreeSet;
 public class LegalNumberOrderTest {
     @Test
     public void _1lt_1sup1() {
-        LegalNumber earlier = new LegalNumber(1, null);
-        LegalNumber following = new LegalNumber(1, "1");
+        LegalNumber earlier = new LegalNumber(1, null,true);
+        LegalNumber following = new LegalNumber(1, "1", true);
 
         Assert.assertTrue("1 must be less than 1\u00B9", earlier.compareTo(following) < 0);
         Assert.assertTrue("1\u00B9 must be more than 1", following.compareTo(earlier) > 0);
@@ -24,8 +24,8 @@ public class LegalNumberOrderTest {
 
     @Test
     public void identicalEqual() {
-        LegalNumber earlier = new LegalNumber(1, "2");
-        LegalNumber following = new LegalNumber(1, "2");
+        LegalNumber earlier = new LegalNumber(1, "2", true);
+        LegalNumber following = new LegalNumber(1, "2", true);
 
         Assert.assertTrue(earlier.compareTo(following) == 0);
         Assert.assertTrue(following.compareTo(earlier) == 0);
@@ -35,8 +35,8 @@ public class LegalNumberOrderTest {
     public void naturalOrdered2ElementTreeSetCorrect() {
         Set<LegalNumber> numberSet = new TreeSet<>(Comparator.naturalOrder());
 
-        LegalNumber earlier = new LegalNumber(1, null);
-        LegalNumber following = new LegalNumber(1, "1");
+        LegalNumber earlier = new LegalNumber(1, null, true);
+        LegalNumber following = new LegalNumber(1, "1", true);
         numberSet.add(following);
         numberSet.add(earlier);
 
@@ -50,10 +50,10 @@ public class LegalNumberOrderTest {
     public void naturalOrdered4ElementTreeSetCorrect() {
         Set<LegalNumber> numberSet = new TreeSet<>();
 
-        LegalNumber b4finita = new LegalNumber(1, "2");
-        LegalNumber finita = new LegalNumber(2, null);
-        LegalNumber earlier = new LegalNumber(1, null);
-        LegalNumber following = new LegalNumber(1, "1");
+        LegalNumber b4finita = new LegalNumber(1, "2", true);
+        LegalNumber finita = new LegalNumber(2, null, true);
+        LegalNumber earlier = new LegalNumber(1, null, true);
+        LegalNumber following = new LegalNumber(1, "1", true);
         numberSet.add(finita);
         numberSet.add(earlier);
         numberSet.add(following);

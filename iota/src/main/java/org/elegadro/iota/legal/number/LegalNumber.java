@@ -24,15 +24,17 @@ public final class LegalNumber implements Serializable, Comparable<LegalNumber> 
     //  grep ylaIndeks= *.xml |   sed -e "s/\t//g" -re "s/.*ylaIndeks=\"([a-zA-Z0-9]*)\".*/\1/"  | sort -n | uniq
     // superscript seems always numeric or empty (NOT 'Roman'!). Not sure about other types of acts yet.
     private final String sup;
+    private final boolean unexpired;
 
-    public LegalNumber(Integer num, String sup) {
-        this(false, num, sup);
+    public LegalNumber(Integer num, String sup, boolean unexpired) {
+        this(false, num, sup, unexpired);
     }
 
-    public LegalNumber(boolean isRoman, Integer num, String sup) {
+    public LegalNumber(boolean isRoman, Integer num, String sup, boolean unexpired) {
         this.isRoman = isRoman;
         this.num = num;
         this.sup = sup;
+        this.unexpired = unexpired;
     }
 
     private void requireNullSup() {
@@ -102,6 +104,7 @@ public final class LegalNumber implements Serializable, Comparable<LegalNumber> 
     public String toDebugString() {
         final StringBuilder sb = new StringBuilder("LegalNumber{");
         sb.append("isRoman=").append(isRoman ? 'T' : 'F');
+        sb.append(", unexpired=").append(unexpired ? 'T' : 'F');
         sb.append(", num=").append(num);
         sb.append(", sup=");
         if (sup == null)

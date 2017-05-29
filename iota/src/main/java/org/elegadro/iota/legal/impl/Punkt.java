@@ -7,10 +7,6 @@ import org.elegadro.iota.legal.number.LegalNumber;
  * @author Taimo Peelo
  */
 public class Punkt extends AbstractLegalParticle {
-    public Punkt(String legalText) {
-        super(legalText);
-    }
-
     public Punkt(String legalText, LegalNumber particleNumber) {
         super(legalText, particleNumber);
     }
