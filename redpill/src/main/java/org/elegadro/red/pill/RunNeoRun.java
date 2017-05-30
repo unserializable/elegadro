@@ -158,7 +158,7 @@ public class RunNeoRun {
             graphDB.execute(CREATE_ELE_USER);
             tx.success();
         }
-        System.out.println("Created Elegardo database default user: " + ELE_USER + "/" + ELE_USER_PW);
+        System.out.println("Created Elegadro database default user: " + ELE_USER + "/" + ELE_USER_PW);
     }
 
     private static void createIndexes(GraphDatabaseService graphDB) {
