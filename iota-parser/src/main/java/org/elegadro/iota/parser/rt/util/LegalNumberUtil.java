@@ -96,8 +96,11 @@ public final class LegalNumberUtil {
                 // Allow one case as 'consistent': where display number (knr) is empty and loige nr
                 // is equal to 1 -- such discrepancy arises because it is customary to not write lg
                 // nr when the whole pg (§) consists of just one loige.
-                if (!(type instanceof LoigeType && "1".equals(nr) && knr.isEmpty()))
-                    throw new IllegalStateException("Unhappystance: '" + knr + "' !!=  '" + nr + "'");
+                if (!(type instanceof LoigeType && "1".equals(nr) && knr.isEmpty())) {
+                    // We can tolerate cases like empty knr vs specified nr when the legal element is in fact expired...
+                    if (!knr.isEmpty() && unexpired)
+                        throw new IllegalStateException("Unhappystance: '" + knr + "' !!=  '" + nr + "'");
+                }
             }
         }
 
