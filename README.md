@@ -5,8 +5,8 @@
 For instructions about running Elegadro PoC locally, skip to
 [Local execution](#local-execution) section.
 
-For online tryout of Elegadro web front-end PoC, one can try visiting
-temporary [website](http://elegadro.timedrops.org/) of Elegadro web-poc.
+For online tryout, visit Elegadro website at
+[http://elegadro.com](http://elegadro.com).
 
 ## Concepts
 Elegadro is e-legal PoC with legal documents (currently Estonian Laws) stored
