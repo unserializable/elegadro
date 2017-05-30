@@ -40,22 +40,24 @@ public class RawIuraSearchServiceImpl implements RawIuraSearchService {
         "RETURN rada;";
 
     @Override
-    public List<Path> textSearch(String freeForm, String langDir, LawParticleEnum actScope) {
-        if (freeForm == null)
+    public List<Path> textSearch(String needle, String langDir, LawParticleEnum actScope) {
+        if (needle == null)
             return Collections.emptyList();
 
-        freeForm = freeForm.trim();
+        needle = needle.trim();
 
-        if (freeForm.isEmpty())
+        if (needle.isEmpty())
              return Collections.emptyList();
 
+        String sharpNeedle = needle.toLowerCase();
+
         String sourceLang = langDir.split("_")[0];
-        Map<String, Object> params = Collections.singletonMap("ss", freeForm);
+        Map<String, Object> params = Collections.singletonMap("ss", sharpNeedle);
 
         List<Path> paths = new LinkedList<>();
         try (Session session = neo.session()) {
             String baseQuery = actScope.equals(LawParticleEnum.SEADUS) ? UPPER_LEVEL_QS : TEXT_SEARCH_QS;
-            String sq = baseQuery.replaceAll("__TEXTFIELD__", "tr_" + sourceLang);
+            String sq = baseQuery.replaceAll("__TEXTFIELD__", "lc_tr_" + sourceLang);
             sq = sq.replaceAll("__ACT_SCOPE__", actScope.getLabel());
             StatementResult sr = session.run(sq, params);
             while (sr.hasNext()) {

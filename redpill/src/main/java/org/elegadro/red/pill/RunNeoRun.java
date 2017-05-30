@@ -167,6 +167,8 @@ public class RunNeoRun {
             try (Transaction tx = graphDB.beginTx()) {
                 graphDB.execute("CREATE INDEX ON :" + lpe.getLabel() + "(tr_et)");
                 graphDB.execute("CREATE INDEX ON :" + lpe.getLabel() + "(tr_en)");
+                graphDB.execute("CREATE INDEX ON :" + lpe.getLabel() + "(lc_tr_et)");
+                graphDB.execute("CREATE INDEX ON :" + lpe.getLabel() + "(lc_tr_en)");
                 tx.success();
             }
             System.out.print(" " + lpe.getLabel());
@@ -339,8 +341,11 @@ public class RunNeoRun {
     private static Node legalMolecul2Node(GraphDatabaseService graphDB, LegalMolecul molET, LegalMolecul molEN) {
         Node molNode = graphDB.createNode(Label.label(molET.getParticleName()));
         molNode.setProperty("tr_et", molET.getLegalText());
-        if (molEN != null)
+        molNode.setProperty("lc_tr_et", molET.getLegalText().toLowerCase());
+        if (molEN != null) {
             molNode.setProperty("tr_en", molEN.getLegalText());
+            molNode.setProperty("lc_tr_en", molEN.getLegalText().toLowerCase());
+        }
 
         if (molET.getParticleNumber() != null) {
             appendLegalNumberToNode(molET.getParticleNumber(), molNode);
@@ -366,8 +371,11 @@ public class RunNeoRun {
     private static Node legalParticle2Node(GraphDatabaseService graphDB, LegalParticle particle, LegalParticle enTrParticle) {
         Node pNode = graphDB.createNode(Label.label(particle.getParticleName()));
         pNode.setProperty("tr_et", particle.getLegalText());
-        if (enTrParticle != null)
+        pNode.setProperty("lc_tr_et", particle.getLegalText().toLowerCase());
+        if (enTrParticle != null) {
             pNode.setProperty("tr_en", enTrParticle.getLegalText());
+            pNode.setProperty("lc_tr_en", enTrParticle.getLegalText().toLowerCase());
+        }
 
         if (particle.getParticleNumber() != null) {
             appendLegalNumberToNode(particle.getParticleNumber(), pNode);
