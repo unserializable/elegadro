@@ -80,10 +80,16 @@ public class IuraWidget extends BaseAppUIWidget {
     private class SearchListener extends StandardEventListener {
         @Override
         public void processEvent(String eventId, String eventParam, InputData input) throws Exception {
-            if (searchForm.convertAndValidate()) {
-                String s = (String) searchForm.getValueByFullName("s");
-                s = s.trim();
+            boolean conversionValid = searchForm.convertAndValidate();
+            String s = null;
+            if (conversionValid) {
+                s = (String) searchForm.getValueByFullName("s");
+                if (s == null)
+                    s = "";
+            }
 
+            if (conversionValid) {
+                s = s.trim();
                 String slangDir = (String) searchForm.getValueByFullName("sd");
 
                 if (log.isDebugEnabled()) {
@@ -102,11 +108,15 @@ public class IuraWidget extends BaseAppUIWidget {
                     resultPaths = rawIuraSS.lawParagraphSearch(lawParagraphSearches);
                 } else {
                     searchString = s;
-                    resultPaths = rawIuraSS.textSearch(s);
+                    resultPaths = rawIuraSS.textSearch(s, slangDir);
                 }
 
-                List<Seadus> matches = pathsAsLaw(resultPaths, !lawParagraphSearches.isEmpty());
-                // TODO: conditional (none if no matches)
+                List<Seadus> matches = pathsAsLaw(resultPaths, !lawParagraphSearches.isEmpty(), slangDir);
+                if (matches.isEmpty()) {
+                    removeWidget("srt");
+                    return;
+                }
+
                 TreeWidget child = new TreeWidget(new SearchResultProvider(matches, !lawParagraphSearches.isEmpty()));
                 child.setUseActions(true);
                 child.setCollapsed(true);
@@ -115,8 +125,8 @@ public class IuraWidget extends BaseAppUIWidget {
             }
         }
 
-        private List<Seadus> pathsAsLaw(List<Path> paths, boolean concretePgSearch) {
-            Set<?> legalParticles = GraphPathUtil.pathsToParticles(paths);
+        private List<Seadus> pathsAsLaw(List<Path> paths, boolean concretePgSearch, String langDir) {
+            Set<?> legalParticles = GraphPathUtil.pathsToParticles(paths, langDir);
             for (Object lp: legalParticles) {
                 if (!(lp instanceof Seadus))
                     throw new IllegalStateException();

@@ -9,6 +9,6 @@ import java.util.List;
  * @author Taimo Peelo
  */
 public interface RawIuraSearchService {
-    List<Path> textSearch(String freeForm);
+    List<Path> textSearch(String freeForm, String langDir);
     List<Path> lawParagraphSearch(List<LawParagraphSearch> lpSearch);
 }

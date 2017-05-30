@@ -28,25 +28,26 @@ public class RawIuraSearchServiceImpl implements RawIuraSearchService {
 
     private static final String TEXT_SEARCH_QS =
         "MATCH rada=(s:Seadus)-[:HAS*..]->(p:Paragrahv)-[:HAS*..]->() " +
-        "WHERE exists (p.text) " +
-        "AND p.text CONTAINS {ss} " +
+        "WHERE exists(p.__TEXTFIELD__) " +
+        "AND p.__TEXTFIELD__ CONTAINS {ss} " +
         "RETURN rada;";
 
     @Override
-    public List<Path> textSearch(String freeForm) {
+    public List<Path> textSearch(String freeForm, String langDir) {
         if (freeForm == null)
             return Collections.emptyList();
 
         freeForm = freeForm.trim();
 
-         if (freeForm.isEmpty())
+        if (freeForm.isEmpty())
              return Collections.emptyList();
 
+        String sourceLang = langDir.split("_")[0];
         Map<String, Object> params = Collections.singletonMap("ss", freeForm);
 
         List<Path> paths = new LinkedList<>();
         try (Session session = neo.session()) {
-            StatementResult sr = session.run(TEXT_SEARCH_QS, params);
+            StatementResult sr = session.run(TEXT_SEARCH_QS.replaceAll("__TEXTFIELD__", "tr_" +sourceLang), params);
             while (sr.hasNext()) {
                 Record next = sr.next();
                 Path path = next.get("rada").asPath();

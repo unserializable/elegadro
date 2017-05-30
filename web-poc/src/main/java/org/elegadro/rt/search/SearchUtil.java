@@ -40,7 +40,7 @@ public class SearchUtil {
             sb
                 .append("MATCH rada=(s:Seadus)-[:HAS*..]->(p:Paragrahv)-[:HAS*..]->() ")
                 .append("WHERE exists(p.`#`) ")
-                .append("AND s.text='")
+                .append("AND s.tr_et='")
                 .append(lps.getAe().getExpanym())
                 .append("' ");
 
@@ -69,6 +69,7 @@ public class SearchUtil {
     }
 
     /** Converts input e.g. "AVRS 17-36 AVRS 40" to suitable law paragraph search. */
+    // TODO: make case insensitive
     public static List<LawParagraphSearch> toLawParagraphSearch(String s) {
         if (s == null)
             return Collections.emptyList();

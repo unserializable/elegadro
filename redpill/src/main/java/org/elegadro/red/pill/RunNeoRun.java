@@ -165,7 +165,7 @@ public class RunNeoRun {
         System.out.print("Creating indexes ...");
         for (LawParticleEnum lpe: LawParticleEnum.values()) {
             try (Transaction tx = graphDB.beginTx()) {
-                graphDB.execute("CREATE INDEX ON :" + lpe.getLabel() + "(text)");
+                graphDB.execute("CREATE INDEX ON :" + lpe.getLabel() + "(tr_et)");
                 graphDB.execute("CREATE INDEX ON :" + lpe.getLabel() + "(tr_en)");
                 tx.success();
             }
@@ -208,7 +208,7 @@ public class RunNeoRun {
 
             Seadus seadusEN = bringTheLawEN(actronym);
             if (seadusEN == null) {
-                System.out.println("!" + actronym.getActronym() + " could not fetch EN translation available at RT.");
+                System.out.println("!" + actronym.getActronym() + " could not fetch or parse EN translation available at RT.");
                 persistTheLaw(graphDB, seadusET, null);
                 etc++;
                 continue;
@@ -254,7 +254,7 @@ public class RunNeoRun {
             ResourceIterator<Node> presentLaws = gdb.findNodes(Label.label(LawParticleEnum.SEADUS.getLabel()));
             while (presentLaws.hasNext()) {
                 Node lawNode = presentLaws.next();
-                String lawName = (String) lawNode.getProperty("text", null);
+                String lawName = (String) lawNode.getProperty("tr_et", null);
                 if (lawName != null) {
                     Actronym actronym = actronyms.stream().filter(a -> a.getExpanym().equals(lawName)).findFirst().get();
                     actronyms.remove(actronym);
@@ -334,7 +334,7 @@ public class RunNeoRun {
 
     private static Node legalMolecul2Node(GraphDatabaseService graphDB, LegalMolecul molET, LegalMolecul molEN) {
         Node molNode = graphDB.createNode(Label.label(molET.getParticleName()));
-        molNode.setProperty("text", molET.getLegalText());
+        molNode.setProperty("tr_et", molET.getLegalText());
         if (molEN != null)
             molNode.setProperty("tr_en", molEN.getLegalText());
 
@@ -361,7 +361,7 @@ public class RunNeoRun {
 
     private static Node legalParticle2Node(GraphDatabaseService graphDB, LegalParticle particle, LegalParticle enTrParticle) {
         Node pNode = graphDB.createNode(Label.label(particle.getParticleName()));
-        pNode.setProperty("text", particle.getLegalText());
+        pNode.setProperty("tr_et", particle.getLegalText());
         if (enTrParticle != null)
             pNode.setProperty("tr_en", enTrParticle.getLegalText());
 
