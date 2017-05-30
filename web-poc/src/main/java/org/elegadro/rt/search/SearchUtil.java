@@ -13,9 +13,32 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 public class SearchUtil {
+    private static final Map<String, Actronym> ACRONYM_UC_2_ACTRONYM =
+        Arrays.stream(Actronym.values())
+            .collect(
+                Collectors.toMap(
+                    v -> v.getActronym().toUpperCase(),
+                    v -> v,
+                    (v1, v2) -> {
+                        throw new IllegalStateException("Impossible happened: Actronyms must be duplicated, received " + v1  + " and " + v2);
+                    },
+                    () -> new LinkedHashMap<>(Actronym.values().length))
+            );
+
     private static final String PATS =
         Arrays.stream(Actronym.values())
-            .map(ae -> Pattern.quote(ae.getActronym()))
+            .map(ae -> {
+                String actronym = ae.getActronym();
+                StringBuilder ulab = new StringBuilder();
+                for (int i = 0; i < actronym.length(); i++) {
+                    char c = actronym.charAt(i);
+                    ulab.append('[')
+                        .append(Pattern.quote("" + Character.toLowerCase(c)))
+                        .append(Pattern.quote("" + Character.toUpperCase(c)))
+                    .append(']');
+                }
+                return ulab.toString();
+            })
             .collect(Collectors.joining("|", "(?<law>", ")"));
 
     private static final String NUMS = "(?<num>\\d+)";
@@ -80,10 +103,8 @@ public class SearchUtil {
         while (m.find()) {
             LawParagraphSearch cs;
             String law = m.group(G_LAW);
-            Actronym ae;
-            try {
-                ae = Actronym.valueOf(law);
-            } catch (IllegalArgumentException iae) {
+            Actronym ae = ACRONYM_UC_2_ACTRONYM.get(law.toUpperCase());
+            if (ae == null) {
                 if (log.isTraceEnabled()) {
                     log.trace("Could not parse actronym for group '" + law + "'");
                 }

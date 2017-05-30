@@ -29,6 +29,17 @@ public class SearchUtilTest {
         Assert.assertTrue("Query string must be terminated with semicolon", x.endsWith(";"));
     }
 
+    @Test
+    public void simpleATKEAS_anycase() {
+        List<LawParagraphSearch> lpss = toLawParagraphSearch("atkEas 1");
+        Assert.assertFalse("Concrete law paragraph search expected", lpss.isEmpty());
+        Assert.assertTrue("Expected one concrete law paragraph search", lpss.size() == 1);
+
+        Assert.assertEquals("ATKEAS type expected", Actronym.ATKEAS, lpss.iterator().next().getAe());
+        Assert.assertEquals("Not a range ", Boolean.FALSE, lpss.iterator().next().isRange());
+        Assert.assertEquals("Paragraph # ", 1, lpss.iterator().next().getNumStart());
+    }
+
     /*
         More samples for tests:
 
