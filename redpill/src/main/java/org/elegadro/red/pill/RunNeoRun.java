@@ -234,7 +234,7 @@ public class RunNeoRun {
     }
 
     private static Seadus bringTheLawET(Actronym actronym) {
-        String localFileName = actronym.getActronym() + ".xml";
+        String localFileName = actronym.getActId() + ".xml";
         Path localFilePath = ELEGADRO_RT_XML_SAVE_PATH.resolve(localFileName);
         if (!Trinity.bringRemoteLawET(actronym, localFilePath))
             return null;
@@ -242,7 +242,7 @@ public class RunNeoRun {
     }
 
     private static Seadus bringTheLawEN(Actronym actronym) {
-        String localFileName = actronym.getActronym() + ".xml";
+        String localFileName = actronym.getTrnId() + ".xml";
         Path localFilePath = ELEGADRO_RT_XML_EN_SAVE_PATH.resolve(localFileName);
         if (!Trinity.bringRemoteLawEN(actronym, localFilePath))
             return null;
