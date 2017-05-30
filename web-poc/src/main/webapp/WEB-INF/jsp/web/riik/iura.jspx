@@ -11,24 +11,25 @@
     <ui:widgetContext>
         <div class="row">
             <div class="form-horizontal">
-
                 <div class="form-group">
-                    <div class="col-xs-offset-1 col-sm-offset-1 col-md-offset-1 col-lg-offset-1 col-xs-10 col-sm-10 col-md-10 col-lg-10">
+                    <div class="col-xs-offset-1 col-sm-offset-1 col-md-offset-1 col-lg-offset-1 col-xs-2 col-sm-2 col-md-1 col-lg-1">
+                        <ui:form id="sf">
+                            <ui:formElement id="sd">
+                                <ui:select styleClass="form-control bootstrap-select" style="border: 1px; border-style: dotted"/>
+                            </ui:formElement>
+                        </ui:form>
+                    </div>
+                    <div class="col-xs-7 col-sm-7 col-md-7 col-lg-7">
                         <ui:form id="sf">
                             <ui:formElement id="s">
-                                <ui:label styleClass="control-label"/>
                                 <ui:textInput styleClass="form-control"/>
                             </ui:formElement>
                         </ui:form>
                     </div>
-                </div>
-
-                <div class="form-group">
-                    <div class="col-xs-offset-1 col-sm-offset-1 col-md-offset-1 col-lg-offset-1 col-xs-1 col-sm-1 col-md-1 col-lg-1">
+                    <div class="col-xs-2 col-sm-2 col-md-1 col-lg-1">
                         <ui:eventButton styleClass="btn btn-primary" eventId="ds">OTSI</ui:eventButton>
                     </div>
                 </div>
-
             </div>
         </div>
 

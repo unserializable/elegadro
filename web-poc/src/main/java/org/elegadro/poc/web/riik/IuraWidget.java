@@ -5,8 +5,10 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.araneaframework.InputData;
 import org.araneaframework.core.StandardEventListener;
 import org.araneaframework.uilib.form.FormWidget;
+import org.araneaframework.uilib.form.control.SelectControl;
 import org.araneaframework.uilib.form.control.TextControl;
 import org.araneaframework.uilib.form.data.StringData;
+import org.araneaframework.uilib.support.DisplayItem;
 import org.araneaframework.uilib.support.TextType;
 import org.araneaframework.uilib.tree.TreeDataProvider;
 import org.araneaframework.uilib.tree.TreeNodeContext;
@@ -41,6 +43,8 @@ public class IuraWidget extends BaseAppUIWidget {
     private static final Comparator<Map.Entry<Seadus, Integer>>
         DESCENDING = Comparator.<Map.Entry<Seadus, Integer>>comparingInt(e -> e.getValue()).reversed();
 
+    private static final String D_ET_ET="et_et", D_ET_EN="et_en", D_EN_EN="en_en", D_EN_ET="en_et";
+
     @Autowired
     private RawIuraSearchService rawIuraSS;
 
@@ -52,10 +56,21 @@ public class IuraWidget extends BaseAppUIWidget {
         setViewSelector("web/riik/iura");
 
         searchForm = new FormWidget();
-        searchForm.addElement("s", "#Iura otsing", new TextControl(TextType.TEXT), new StringData(), null, false);
+        searchForm.addElement("sd", "#", buildSearchDirSelect(), new StringData(), true);
+        searchForm.addElement("s", "#", new TextControl(TextType.TEXT), new StringData(), null, false);
 
         addWidget("sf", searchForm);
         addEventListener("ds", new SearchListener());
+    }
+
+    private SelectControl buildSearchDirSelect() {
+        SelectControl selectControl = new SelectControl();
+        selectControl.addItem(new DisplayItem(D_ET_ET, "ET->ET"));
+        selectControl.addItem(new DisplayItem(D_ET_EN, "ET->EN"));
+        selectControl.addItem(new DisplayItem(D_EN_EN, "EN->EN"));
+        selectControl.addItem(new DisplayItem(D_EN_ET, "EN->ET"));
+        // TODO: onChangeListener ...
+        return selectControl;
     }
 
     public String getSearchString() {
@@ -69,8 +84,10 @@ public class IuraWidget extends BaseAppUIWidget {
                 String s = (String) searchForm.getValueByFullName("s");
                 s = s.trim();
 
+                String slangDir = (String) searchForm.getValueByFullName("sd");
+
                 if (log.isDebugEnabled()) {
-                    log.debug(" search string was '" + s + "'");
+                    log.debug(" search string was '" + s + "' search language direction " + slangDir);
                 }
 
                 List<LawParagraphSearch> lawParagraphSearches = SearchUtil.toLawParagraphSearch(s);
