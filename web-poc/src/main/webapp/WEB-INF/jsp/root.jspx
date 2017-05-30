@@ -11,7 +11,7 @@
 		<head>
 			<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1"/>
-			<title>Elegadro Graph Based Legal Search Web POC</title>
+			<title>Elegadro PoC</title>
 
 			<jsp:include page="favicon.jspx"/>
 			<jsp:include page="scripts.jspx"/>
