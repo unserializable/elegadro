@@ -7,6 +7,7 @@
 
     <ui:importStyles group="calendar"/>
     <ui:importStyles group="patternfly"/>
+	<ui:importStyles group="bootstrap-slider"/>
 
     <ui:importScripts group="core"/>
 
@@ -87,6 +88,7 @@ var AraneaTree = {
 	<script type="text/javascript">var jq_no_conflict = jQuery.noConflict();</script>
 	<ui:importScripts group="bootstrap"/>
 	<ui:importScripts group="patternfly"/>
+	<ui:importScripts group="bootstrap-slider"/>
 	<ui:importScripts file="js/behaviour/behaviour.js" />
 	<ui:importScripts group="mark"/>
 

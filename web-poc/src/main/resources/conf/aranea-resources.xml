@@ -12,6 +12,10 @@
         <file path="patternfly/css/patternfly-additions.css" />
     </files>
 
+    <files content-type="text/css" group="bootstrap-slider.css">
+        <file path="bs-slider/css/bootstrap-slider.css" />
+    </files>
+
     <files content-type="text/javascript" group="jquery.js">
         <file path="jq/jquery.js" />
     </files>
@@ -26,6 +30,10 @@
 
     <files content-type="text/javascript" group="bootstrap.js">
         <file path="bs/js/bootstrap.js" />
+    </files>
+
+    <files content-type="text/javascript" group="bootstrap-slider.js">
+        <file path="bs-slider/bootstrap-slider.js" />
     </files>
 
     <files content-type="text/javascript" group="mark.js">
@@ -64,31 +72,6 @@
         <file path="gfx/ico_prev.gif" />
         <file path="gfx/ico_sortdown.gif" />
         <file path="gfx/ico_sortup.gif" />
-        <file path="gfx/logo_aranea_print.gif" />
-        <file path="gfx/logo_aranea_screen.jpg" />
-        <file path="gfx/logo_aranea_login.jpg" />
-        <file path="gfx/ico/ai.gif" />
-        <file path="gfx/ico/avi.gif" />
-        <file path="gfx/ico/bmp.gif" />
-        <file path="gfx/ico/cdr.gif" />
-        <file path="gfx/ico/csv.gif" />
-        <file path="gfx/ico/doc.gif" />
-        <file path="gfx/ico/eml.gif" />
-        <file path="gfx/ico/exe.gif" />
-        <file path="gfx/ico/gif.gif" />
-        <file path="gfx/ico/html.gif" />
-        <file path="gfx/ico/jpg.gif" />
-        <file path="gfx/ico/mdb.gif" />
-        <file path="gfx/ico/mp3.gif" />
-        <file path="gfx/ico/mpg.gif" />
-        <file path="gfx/ico/pdf.gif" />
-        <file path="gfx/ico/png.gif" />
-        <file path="gfx/ico/ppt.gif" />
-        <file path="gfx/ico/psd.gif" />
-        <file path="gfx/ico/rar.gif" />
-        <file path="gfx/ico/txt.gif" />
-        <file path="gfx/ico/xls.gif" />
-        <file path="gfx/ico/zip.gif" />
         <file path="gfx/bg16.gif" />
         <file path="gfx/butt_accept.gif" />
         <file path="gfx/butt_expand.gif" />
@@ -141,32 +124,7 @@
         <file path="gfx/calendar_scrollup.gif" />
     </files>
 
-    <!-- favicons -->
-    <files content-type="image/png">
-        <file path="fav/favicon-114.png"/>
-        <file path="fav/favicon-120.png"/>
-        <file path="fav/favicon-144.png"/>
-        <file path="fav/favicon-150.png"/>
-        <file path="fav/favicon-152.png"/>
-        <file path="fav/favicon-160.png"/>
-        <file path="fav/favicon-16.png"/>
-        <file path="fav/favicon-180.png"/>
-        <file path="fav/favicon-192.png"/>
-        <file path="fav/favicon-310.png"/>
-        <file path="fav/favicon-32.png"/>
-        <file path="fav/favicon-57.png"/>
-        <file path="fav/favicon-60.png"/>
-        <file path="fav/favicon-64.png"/>
-        <file path="fav/favicon-70.png"/>
-        <file path="fav/favicon-72.png"/>
-        <file path="fav/favicon-76.png"/>
-        <file path="fav/favicon-96.png"/>
-    </files>
-
-    <files content-type="image/svg+xml">
-        <file path="gfx/smm/smm-logo-first.svg"/>
-        <file path="gfx/smm/smm-logo-second.svg"/>
-    </files>
+    <!-- favicons, when made -->
 
     <files content-type="image/x-icon">
         <file path="fav/favicon.ico"/>

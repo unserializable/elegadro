@@ -15,6 +15,7 @@ import org.araneaframework.uilib.tree.TreeDataProvider;
 import org.araneaframework.uilib.tree.TreeNodeContext;
 import org.araneaframework.uilib.tree.TreeNodeWidget;
 import org.araneaframework.uilib.tree.TreeWidget;
+import org.elegadro.iota.legal.LawParticleEnum;
 import org.elegadro.iota.legal.LegalMolecul;
 import org.elegadro.iota.legal.LegalParticle;
 import org.elegadro.iota.legal.impl.Seadus;
@@ -49,6 +50,8 @@ public class IuraWidget extends BaseAppUIWidget {
     @Autowired
     private RawIuraSearchService rawIuraSS;
 
+    private LawParticleEnum actScope = LawParticleEnum.PARAGRAHV;
+
     private FormWidget searchForm;
     private String searchString;
 
@@ -56,27 +59,23 @@ public class IuraWidget extends BaseAppUIWidget {
     protected void init() throws Exception {
         setViewSelector("web/riik/iura");
 
+        addEventListener("asc", new ActScopeChangeListener());
+
         searchForm = new FormWidget();
         SelectControl langDirSelect = buildSearchDirSelect();
         searchForm.addElement("sd", "#", langDirSelect, new StringData(), true);
         searchForm.addElement("s", "#", new TextControl(TextType.TEXT), new StringData(), null, false);
 
-        langDirSelect.addOnChangeEventListener(new OnChangeEventListener() {
-            @Override
-            public void onChange() throws Exception {
-                if (searchForm.getElementByFullName("sd").convertAndValidate()) {
-                    String slangDir = (String) searchForm.getValueByFullName("sd");
+        langDirSelect.addOnChangeEventListener((OnChangeEventListener) () -> {
+            if (searchForm.getElementByFullName("sd").convertAndValidate()) {
+                String slangDir = (String) searchForm.getValueByFullName("sd");
 
-                    String s = (String) searchForm.getValueByFullName("s");
-                    if (s == null)
-                        s = "";
+                String s = (String) searchForm.getValueByFullName("s");
+                if (s == null)
+                    s = "";
 
-                    s = s.trim();
-
-                    log.debug("received onchange to... " + slangDir + " search string to use is " + s);
-
-                    performSearch(s, slangDir);
-                }
+                s = s.trim();
+                performSearch(s, slangDir);
             }
         });
 
@@ -97,11 +96,34 @@ public class IuraWidget extends BaseAppUIWidget {
         return StringEscapeUtils.escapeJavaScript(searchString);
     }
 
+    public int getActScopeAsInt() {
+        return actScope.ordinal();
+    }
+
+    private class ActScopeChangeListener extends StandardEventListener {
+        @Override
+        public void processEvent(String eventId, String eventParam, InputData input) throws Exception {
+            LawParticleEnum received;
+            try {
+                received = LawParticleEnum.valueOf(eventParam);
+            } catch (IllegalArgumentException iae) {
+                log.warn("Received illegal actscope value: '" + eventParam + "'");
+                return;
+            }
+
+            actScope = received;
+            String s = (searchString != null) ? searchString : (String) searchForm.getValueByFullName("s");
+            if (s == null) s = "";
+            s = s.trim();
+            performSearch(s, (String) searchForm.getValueByFullName("sd"));
+        }
+    }
+
     private class SearchListener extends StandardEventListener {
         @Override
         public void processEvent(String eventId, String eventParam, InputData input) throws Exception {
             boolean conversionValid = searchForm.convertAndValidate();
-            String s = null;
+            String s;
             if (conversionValid) {
                 if (null == (s = (String) searchForm.getValueByFullName("s")))
                     s = "";
@@ -120,7 +142,7 @@ public class IuraWidget extends BaseAppUIWidget {
     private void performSearch(String s, String langDir) {
         List<LawParagraphSearch> pgSearches = SearchUtil.toLawParagraphSearch(s);
         List<Path> resultPaths = pgSearches.isEmpty() ?
-            pathsFromTextualSearch(s, langDir) : pathsFromPgSearch(pgSearches);
+            pathsFromTextualSearch(s, langDir, actScope) : pathsFromPgSearch(pgSearches);
         List<Seadus> matches = pathsAsLaw(resultPaths, !pgSearches.isEmpty(), langDir);
         showSearchResults(matches, !pgSearches.isEmpty());
     }
@@ -138,9 +160,9 @@ public class IuraWidget extends BaseAppUIWidget {
         return rawIuraSS.lawParagraphSearch(lpSearches);
     }
 
-    private List<Path> pathsFromTextualSearch(String s, String langDir) {
+    private List<Path> pathsFromTextualSearch(String s, String langDir, LawParticleEnum actScope) {
         searchString = s;
-        return rawIuraSS.textSearch(s, langDir);
+        return rawIuraSS.textSearch(s, langDir, actScope);
     }
 
     private void showSearchResults(List<Seadus> matches, boolean concretePgSearch) {

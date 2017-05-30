@@ -12,6 +12,43 @@
         <div class="row">
             <div class="form-horizontal">
                 <div class="form-group">
+                    <div class="col-xs-offset-2 col-sm-offset-2 col-md-offset-3 col-lg-offset-3 col-xs-9 col-sm-9 col-md-7 col-lg-7">
+                        <input id="elegadro_act_scope_slider" type="hidden"
+                              data-provide="slider"
+                              data-slider-ticks="[0, 1, 2, 3, 4, 5, 6, 7, 8]"
+                              data-slider-ticks-labels='["Sea", "Osa", "Pea", "Jag", "Jao", "All", "Par", "Lõi", "Pun"]'
+                              data-slider-min="0"
+                              data-slider-max="8"
+                              data-slider-step="1"
+                              data-slider-value="${widget.actScopeAsInt}"
+                              data-slider-tooltip="hide"/>
+                    </div>
+                    <div class="col-xs-1 col-sm-1 col-md-2 col-lg-2"></div>
+                </div>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+            var elegadroSubmitFromSlider = function (newScope) {
+                _ap.event_6(_ap.getSystemForm(), 'asc', '${widget.scope}', newScope, null, null);
+            };
+            <![CDATA[
+             var elegadroActScopeSliderChange = function() {
+                 var valarr = ['SEADUS', 'OSA', 'PEATYKK', 'JAGU', 'JAOTIS', 'ALLJAOTIS', 'PARAGRAHV', 'LOIGE', 'PUNKT'];
+                 var el = document.querySelector("#elegadro_act_scope_slider")
+                 var iix = el.getValue();
+                 var newScope = valarr[iix];
+                 elegadroSubmitFromSlider(newScope);
+             };
+
+             var elegadroActScopeSlider = jQuery('#elegadro_act_scope_slider').slider()
+                 .on('change', elegadroActScopeSliderChange)
+                 .data('slider');
+        ]]></script>
+
+        <div class="row">
+            <div class="form-horizontal">
+                <div class="form-group">
                     <div class="col-xs-offset-1 col-sm-offset-1 col-md-offset-1 col-lg-offset-1 col-xs-2 col-sm-2 col-md-1 col-lg-1">
                         <ui:form id="sf">
                             <ui:formElement id="sd">

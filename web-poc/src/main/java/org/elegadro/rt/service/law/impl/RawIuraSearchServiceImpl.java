@@ -1,5 +1,6 @@
 package org.elegadro.rt.service.law.impl;
 
+import org.elegadro.iota.legal.LawParticleEnum;
 import org.elegadro.rt.search.LawParagraphSearch;
 import org.elegadro.rt.search.SearchUtil;
 import org.elegadro.rt.service.law.RawIuraSearchService;
@@ -27,13 +28,19 @@ public class RawIuraSearchServiceImpl implements RawIuraSearchService {
     private Driver neo;
 
     private static final String TEXT_SEARCH_QS =
-        "MATCH rada=(s:Seadus)-[:HAS*..]->(p:Paragrahv)-[:HAS*..]->() " +
+        "MATCH rada=(s:Seadus)-[:HAS*..]->(p:__ACT_SCOPE__)-[:HAS*..]->() " +
         "WHERE exists(p.__TEXTFIELD__) " +
         "AND p.__TEXTFIELD__ CONTAINS {ss} " +
         "RETURN rada;";
 
+    private static final String UPPER_LEVEL_QS =
+        "MATCH rada=(s:Seadus)-[:HAS*..]->() " +
+        "WHERE exists(s.__TEXTFIELD__) " +
+        "AND s.__TEXTFIELD__ CONTAINS {ss} " +
+        "RETURN rada;";
+
     @Override
-    public List<Path> textSearch(String freeForm, String langDir) {
+    public List<Path> textSearch(String freeForm, String langDir, LawParticleEnum actScope) {
         if (freeForm == null)
             return Collections.emptyList();
 
@@ -47,7 +54,10 @@ public class RawIuraSearchServiceImpl implements RawIuraSearchService {
 
         List<Path> paths = new LinkedList<>();
         try (Session session = neo.session()) {
-            StatementResult sr = session.run(TEXT_SEARCH_QS.replaceAll("__TEXTFIELD__", "tr_" +sourceLang), params);
+            String baseQuery = actScope.equals(LawParticleEnum.SEADUS) ? UPPER_LEVEL_QS : TEXT_SEARCH_QS;
+            String sq = baseQuery.replaceAll("__TEXTFIELD__", "tr_" + sourceLang);
+            sq = sq.replaceAll("__ACT_SCOPE__", actScope.getLabel());
+            StatementResult sr = session.run(sq, params);
             while (sr.hasNext()) {
                 Record next = sr.next();
                 Path path = next.get("rada").asPath();
