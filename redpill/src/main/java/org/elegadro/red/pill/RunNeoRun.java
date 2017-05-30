@@ -295,10 +295,14 @@ public class RunNeoRun {
         // as happens to be somewhat of a convention between Estonian/English acts...
         // e.g. LegalNumber{isRoman=T, num=2, sup=null} & LegalNumber{isRoman=F, num=2, sup=null}
         if (!((p1n == p2n) || (p1n != null && 0 == p1n.compareTo(p2n)))) {
-            String v1 = (p1n != null) ? p1n.toDebugString() : null;
-            String v2 = (p2n != null) ? p2n.toDebugString() : null;
-            System.err.println("Particle number mismatch " + toParentDbgString(parents) + " at " + n1 + ": '" + v1  + "' != '" + v2 + "'");
-            result = false;
+            // Additionally cut slack when both particles are correctly marked expired (rare...)
+            // while their numbers have been left unsynced
+            if (p1n.isUnexpired() || p2n.isUnexpired()) {
+                String v1 = (p1n != null) ? p1n.toDebugString() : null;
+                String v2 = (p2n != null) ? p2n.toDebugString() : null;
+                System.err.println("Particle number mismatch " + toParentDbgString(parents) + " at " + n1 + ": '" + v1 + "' != '" + v2 + "'");
+                result = false;
+            }
         }
 
         return result;
