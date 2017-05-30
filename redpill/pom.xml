@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>redpill</artifactId>
-    <version>0.2.0-SNAPSHOT</version>
+    <version>0.3.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>"You must stand alone, Neo!"</name>
@@ -112,6 +112,12 @@
             <version>1.7.21</version>
             <!-- This ^replaces^ dependency on commons-logging 1.1.1 with SLF4J ^^ drop-in
                  replacement: http://www.slf4j.org/legacy.html ! -->
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
         </dependency>
 
         <dependency>
