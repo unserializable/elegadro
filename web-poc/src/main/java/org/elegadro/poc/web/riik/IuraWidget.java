@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.araneaframework.InputData;
 import org.araneaframework.core.StandardEventListener;
+import org.araneaframework.uilib.event.OnChangeEventListener;
 import org.araneaframework.uilib.form.FormWidget;
 import org.araneaframework.uilib.form.control.SelectControl;
 import org.araneaframework.uilib.form.control.TextControl;
@@ -56,8 +57,28 @@ public class IuraWidget extends BaseAppUIWidget {
         setViewSelector("web/riik/iura");
 
         searchForm = new FormWidget();
-        searchForm.addElement("sd", "#", buildSearchDirSelect(), new StringData(), true);
+        SelectControl langDirSelect = buildSearchDirSelect();
+        searchForm.addElement("sd", "#", langDirSelect, new StringData(), true);
         searchForm.addElement("s", "#", new TextControl(TextType.TEXT), new StringData(), null, false);
+
+        langDirSelect.addOnChangeEventListener(new OnChangeEventListener() {
+            @Override
+            public void onChange() throws Exception {
+                if (searchForm.getElementByFullName("sd").convertAndValidate()) {
+                    String slangDir = (String) searchForm.getValueByFullName("sd");
+
+                    String s = (String) searchForm.getValueByFullName("s");
+                    if (s == null)
+                        s = "";
+
+                    s = s.trim();
+
+                    log.debug("received onchange to... " + slangDir + " search string to use is " + s);
+
+                    performSearch(s, slangDir);
+                }
+            }
+        });
 
         addWidget("sf", searchForm);
         addEventListener("ds", new SearchListener());
@@ -69,7 +90,6 @@ public class IuraWidget extends BaseAppUIWidget {
         selectControl.addItem(new DisplayItem(D_ET_EN, "ET->EN"));
         selectControl.addItem(new DisplayItem(D_EN_EN, "EN->EN"));
         selectControl.addItem(new DisplayItem(D_EN_ET, "EN->ET"));
-        // TODO: onChangeListener ...
         return selectControl;
     }
 
@@ -83,68 +103,78 @@ public class IuraWidget extends BaseAppUIWidget {
             boolean conversionValid = searchForm.convertAndValidate();
             String s = null;
             if (conversionValid) {
-                s = (String) searchForm.getValueByFullName("s");
-                if (s == null)
+                if (null == (s = (String) searchForm.getValueByFullName("s")))
                     s = "";
-            }
 
-            if (conversionValid) {
                 s = s.trim();
                 String slangDir = (String) searchForm.getValueByFullName("sd");
-
                 if (log.isDebugEnabled()) {
                     log.debug(" search string was '" + s + "' search language direction " + slangDir);
                 }
 
-                List<LawParagraphSearch> lawParagraphSearches = SearchUtil.toLawParagraphSearch(s);
-                List<Path> resultPaths;
-                if (!lawParagraphSearches.isEmpty()) {
-                    searchString = null;
-                    log.debug("Concrete law paragraph search to be executed ");
-                    if (log.isTraceEnabled()) {
-                        log.trace(String.valueOf(lawParagraphSearches));
-                    }
-
-                    resultPaths = rawIuraSS.lawParagraphSearch(lawParagraphSearches);
-                } else {
-                    searchString = s;
-                    resultPaths = rawIuraSS.textSearch(s, slangDir);
-                }
-
-                List<Seadus> matches = pathsAsLaw(resultPaths, !lawParagraphSearches.isEmpty(), slangDir);
-                if (matches.isEmpty()) {
-                    removeWidget("srt");
-                    return;
-                }
-
-                TreeWidget child = new TreeWidget(new SearchResultProvider(matches, !lawParagraphSearches.isEmpty()));
-                child.setUseActions(true);
-                child.setCollapsed(true);
-                child.setRemoveChildrenOnCollapse(false);
-                addWidget("srt", child);
+                performSearch(s, slangDir);
             }
         }
+    }
 
-        private List<Seadus> pathsAsLaw(List<Path> paths, boolean concretePgSearch, String langDir) {
-            Set<?> legalParticles = GraphPathUtil.pathsToParticles(paths, langDir);
-            for (Object lp: legalParticles) {
-                if (!(lp instanceof Seadus))
-                    throw new IllegalStateException();
-            }
+    private void performSearch(String s, String langDir) {
+        List<LawParagraphSearch> pgSearches = SearchUtil.toLawParagraphSearch(s);
+        List<Path> resultPaths = pgSearches.isEmpty() ?
+            pathsFromTextualSearch(s, langDir) : pathsFromPgSearch(pgSearches);
+        List<Seadus> matches = pathsAsLaw(resultPaths, !pgSearches.isEmpty(), langDir);
+        showSearchResults(matches, !pgSearches.isEmpty());
+    }
 
-            if (concretePgSearch)
-                return new ArrayList(legalParticles);
+    private List<Path> pathsFromPgSearch(List<LawParagraphSearch> lpSearches) {
+        if (lpSearches.isEmpty())
+            throw new IllegalStateException("Empty paragraph search provided.");
 
-            List<Map.Entry<Seadus, Integer>> results = legalParticles.stream()
-                .map(lp -> (Seadus) lp)
-                .map(lp -> singletonMap(lp, lp.particleCount()).entrySet().iterator().next())
-                .collect(toList());
-
-            // sort the results so that laws with more matches for search are shown first
-            results.sort(DESCENDING);
-
-            return new ArrayList(results.stream().map(e -> e.getKey()).collect(toList()));
+        searchString = null;
+        log.debug("Concrete law paragraph search to be executed ");
+        if (log.isTraceEnabled()) {
+            log.trace(String.valueOf(lpSearches));
         }
+
+        return rawIuraSS.lawParagraphSearch(lpSearches);
+    }
+
+    private List<Path> pathsFromTextualSearch(String s, String langDir) {
+        searchString = s;
+        return rawIuraSS.textSearch(s, langDir);
+    }
+
+    private void showSearchResults(List<Seadus> matches, boolean concretePgSearch) {
+        if (matches.isEmpty()) {
+            removeWidget("srt");
+            return;
+        }
+
+        TreeWidget child = new TreeWidget(new SearchResultProvider(matches, concretePgSearch));
+        child.setUseActions(true);
+        child.setCollapsed(true);
+        child.setRemoveChildrenOnCollapse(false);
+        addWidget("srt", child);
+    }
+
+    private static List<Seadus> pathsAsLaw(List<Path> paths, boolean concretePgSearch, String langDir) {
+        Set<?> legalParticles = GraphPathUtil.pathsToParticles(paths, langDir);
+        for (Object lp: legalParticles) {
+            if (!(lp instanceof Seadus))
+                throw new IllegalStateException();
+        }
+
+        if (concretePgSearch)
+            return new ArrayList(legalParticles);
+
+        List<Map.Entry<Seadus, Integer>> results = legalParticles.stream()
+            .map(lp -> (Seadus) lp)
+            .map(lp -> singletonMap(lp, lp.particleCount()).entrySet().iterator().next())
+            .collect(toList());
+
+        // sort the results so that laws with more matches for search are shown first
+        results.sort(DESCENDING);
+
+        return new ArrayList(results.stream().map(e -> e.getKey()).collect(toList()));
     }
 
     private static class SearchResultProvider implements TreeDataProvider {

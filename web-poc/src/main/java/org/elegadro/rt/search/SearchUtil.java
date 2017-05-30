@@ -92,7 +92,6 @@ public class SearchUtil {
     }
 
     /** Converts input e.g. "AVRS 17-36 AVRS 40" to suitable law paragraph search. */
-    // TODO: make case insensitive
     public static List<LawParagraphSearch> toLawParagraphSearch(String s) {
         if (s == null)
             return Collections.emptyList();
