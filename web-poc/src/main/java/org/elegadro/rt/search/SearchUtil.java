@@ -29,26 +29,30 @@ public class SearchUtil {
         Arrays.stream(Actronym.values())
             .map(ae -> {
                 String actronym = ae.getActronym();
-                StringBuilder ulab = new StringBuilder();
+                StringBuilder ulab = new StringBuilder("(");
                 for (int i = 0; i < actronym.length(); i++) {
                     char c = actronym.charAt(i);
-                    ulab.append('[')
+                    ulab.append("[")
                         .append(Pattern.quote("" + Character.toLowerCase(c)))
                         .append(Pattern.quote("" + Character.toUpperCase(c)))
-                    .append(']');
+                    .append("]");
                 }
+                ulab.append(")");
                 return ulab.toString();
             })
-            .collect(Collectors.joining("|", "(?<law>", ")"));
+            .collect(Collectors.joining("|", "(?<law>", "){1}"));
 
     private static final String NUMS = "(?<num>\\d+)";
     private static final String RANGES = "(?<r>(?<rs>\\d+)\\s*(-)+\\s*(?<re>\\d+))";
     private static final String S_WS = "(\\s+)";
 
-    private static final String NUMS_OR_RANGES = "(" + RANGES + "|" + NUMS + ")";
+    private static final String NUMS_OR_RANGES = "(?<seq>(" + RANGES + "|" + NUMS + "\\s*,?)+)";
 
     private static final Pattern LAW_ACTRONYM_PATTERN = Pattern.compile(PATS + S_WS + NUMS_OR_RANGES);
+    private static final Pattern PG_SINGLE_PATTERN = Pattern.compile("(\\s*)" + NUMS + "(\\s*)");
+    private static final Pattern PG_RANGE_PATTERN = Pattern.compile("(\\s*)" + RANGES + "(\\s*)");
 
+    private static final String G_SEQ = "seq";
     private static final String G_LAW = "law";
     private static final String G_NUM = "num";
     private static final String G_RANGE = "r";
@@ -100,7 +104,6 @@ public class SearchUtil {
         List cssList = new LinkedList();
         Matcher m = LAW_ACTRONYM_PATTERN.matcher(s);
         while (m.find()) {
-            LawParagraphSearch cs;
             String law = m.group(G_LAW);
             Actronym ae = ACRONYM_UC_2_ACTRONYM.get(law.toUpperCase());
             if (ae == null) {
@@ -110,17 +113,24 @@ public class SearchUtil {
                 continue;
             }
 
-            String num = m.group(G_NUM);
-            if (null == num) {
-                // look for range
-                String rangeStart = m.group(G_RANGE_START);
-                String rangeEnd = m.group(G_RANGE_END);
-                cs = new LawParagraphSearch(ae, Integer.valueOf(rangeStart), Integer.valueOf(rangeEnd));
-            } else {
-                cs = new LawParagraphSearch(ae, Integer.valueOf(num));
+            String pgSeq = m.group(G_SEQ);
+            String[] pgQs = pgSeq.split(",");
+            for (int i = 0; i < pgQs.length; i++) {
+                String that = pgQs[i];
+                Matcher singleMatcher = PG_SINGLE_PATTERN.matcher(that);
+                if (singleMatcher.matches()) {
+                    cssList.add(new LawParagraphSearch(ae, Integer.valueOf(singleMatcher.group(G_NUM))));
+                    continue;
+                }
+                Matcher rangeMatcher = PG_RANGE_PATTERN.matcher(that);
+                if (rangeMatcher.matches()) {
+                    String rangeStart = rangeMatcher.group(G_RANGE_START);
+                    String rangeEnd = rangeMatcher.group(G_RANGE_END);
+                    LawParagraphSearch lprs = new LawParagraphSearch(ae, Integer.valueOf(rangeStart), Integer.valueOf(rangeEnd));
+                    cssList.add(lprs);
+                    continue;
+                }
             }
-
-            cssList.add(cs);
         }
 
         return cssList.isEmpty() ? Collections.emptyList() : cssList;
