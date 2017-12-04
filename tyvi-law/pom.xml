@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>tyvi-law</artifactId>
-    <version>0.2-SNAPSHOT</version>
+    <version>0.2.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Estonian 'tyviseadus' to Java.</name>
@@ -103,6 +103,7 @@
                     <extension>true</extension>
                     <args>
                         <arg>-Xvisitor</arg>
+                        <arg>-Xvisitor-package:_2010._02.juurakt_1_10</arg>
                     </args>
 
                     <!-- Plugins in da plugins and Visitor API generation. -->
