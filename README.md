@@ -163,7 +163,7 @@ mvn clean install
 Note that initialization of Elegadro graph database requires internet connection to be
 present. Open separate console in `elegadro/redpill` folder and execute:
 ```
-java -jar target/redpill-0.2.0-SNAPSHOT.jar
+java -jar target/redpill-0.4.0-SNAPSHOT.jar
 ```
 
 Wait until program gives a message about database having been started. On the
