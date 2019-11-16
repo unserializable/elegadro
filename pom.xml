@@ -5,7 +5,7 @@
 
     <groupId>org.elegadro</groupId>
     <artifactId>oss-parent</artifactId>
-    <version>0.6</version>
+    <version>0.7</version>
     <packaging>pom</packaging>
 
     <name>Elegadro OSS Parent POM</name>
@@ -32,18 +32,18 @@
 
         <jool.version>0.9.12</jool.version>
         <joor.version>0.9.6</joor.version>
-        <lombok.version>1.16.12</lombok.version>
+        <lombok.version>1.16.22</lombok.version>
 
         <applibs.folder>${project.basedir}/.applibs</applibs.folder>
 
         <logback.version>1.2.3</logback.version>
         <servlet.api.version>3.1.0</servlet.api.version>
-        <jetty.version>9.3.19.v20170502</jetty.version>
-        <spring.version>4.3.6.RELEASE</spring.version>
+        <jetty.version>9.3.28.v20191105</jetty.version>
+        <spring.version>4.3.25.RELEASE</spring.version>
         <jsoup.version>1.10.2</jsoup.version>
         <aranea.version>1.2.2</aranea.version>
         <aranea.base64.version>1.0</aranea.base64.version>
-        <neo4j.version>3.1.1</neo4j.version>
+        <neo4j.version>3.1.9</neo4j.version>
     </properties>
 
     <modules>

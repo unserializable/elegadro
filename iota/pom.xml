@@ -5,12 +5,12 @@
     <parent>
         <artifactId>oss-parent</artifactId>
         <groupId>org.elegadro</groupId>
-        <version>0.6</version>
+        <version>0.7</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>iota</artifactId>
-    <version>0.1</version>
+    <version>0.2</version>
     <packaging>jar</packaging>
 
     <name>Elegadro legal 'particles' in a separate artifact.</name>

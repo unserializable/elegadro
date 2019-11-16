@@ -7,11 +7,11 @@
     <parent>
         <artifactId>oss-parent</artifactId>
         <groupId>org.elegadro</groupId>
-        <version>0.6</version>
+        <version>0.7</version>
     </parent>
 
     <artifactId>iota-parser</artifactId>
-    <version>0.1</version>
+    <version>0.2</version>
     <packaging>jar</packaging>
 
     <name>Support artifact for parsing tyviseadus XML Schemas into 'particles'.</name>
@@ -71,7 +71,7 @@
         <dependency>
             <groupId>org.elegadro</groupId>
             <artifactId>iota</artifactId>
-            <version>0.1</version>
+            <version>0.2</version>
         </dependency>
 
         <dependency>
