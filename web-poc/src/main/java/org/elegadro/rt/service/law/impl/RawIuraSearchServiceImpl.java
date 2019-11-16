@@ -39,6 +39,12 @@ public class RawIuraSearchServiceImpl implements RawIuraSearchService {
         "AND s.__TEXTFIELD__ CONTAINS {ss} " +
         "RETURN rada;";
 
+    private static final String LOWER_LEVEL_QS =
+        "MATCH rada=(s:Seadus)-[:HAS*..]->(p:__ACT_SCOPE__) " +
+        "WHERE exists(p.__TEXTFIELD__) " +
+        "AND p.__TEXTFIELD__ CONTAINS {ss} " +
+        "RETURN rada;";
+
     @Override
     public List<Path> textSearch(String needle, String langDir, LawParticleEnum actScope) {
         if (needle == null)
@@ -56,9 +62,16 @@ public class RawIuraSearchServiceImpl implements RawIuraSearchService {
 
         List<Path> paths = new LinkedList<>();
         try (Session session = neo.session()) {
-            String baseQuery = actScope.equals(LawParticleEnum.SEADUS) ? UPPER_LEVEL_QS : TEXT_SEARCH_QS;
+            String baseQuery = TEXT_SEARCH_QS;
+            if (actScope.equals(LawParticleEnum.SEADUS))
+                baseQuery = UPPER_LEVEL_QS;
+            else if (actScope.equals(LawParticleEnum.PUNKT))
+                baseQuery = LOWER_LEVEL_QS;
             String sq = baseQuery.replaceAll("__TEXTFIELD__", "lc_tr_" + sourceLang);
             sq = sq.replaceAll("__ACT_SCOPE__", actScope.getLabel());
+            if (log.isTraceEnabled()) {
+                log.trace("EXEC Q: {}", sq);
+            }
             StatementResult sr = session.run(sq, params);
             while (sr.hasNext()) {
                 Record next = sr.next();
