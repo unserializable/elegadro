@@ -64,29 +64,34 @@ public class RunNeoRun {
         File storeDir = ELEGADRO_NEO_DATADIR.toFile();
 
         ServerBootstrapper serverBootstrapper = new CommunityBootstrapper();
-        String webAddr = "127.0.0.1:7474";
+        String bindHost = System.getProperty("redpill.bindHost", "127.0.0.1");
+        String httpPort = System.getProperty("redpill.httpPort", "7474");
+        String boltPort = System.getProperty("redpill.boltPort", "7687");
+        String shellPort = System.getProperty("redpill.shellPort", "1337");
+
+        String webAddr = bindHost + ":" + httpPort;
+        String boltAddr = bindHost + ":" + boltPort;
         serverBootstrapper.start(
             storeDir,
             Optional.empty(), // no configfile provided: few properties follow
             Pair.of("dbms.connector.http.address", webAddr),
-            Pair.of("dbms.connector.http.enabled", "true"),
+            Pair.of("dbms.connector.bolt.address", boltAddr),
             Pair.of("dbms.connector.bolt.enabled", "true"),
+            Pair.of("dbms.connector.http.enabled", "true"),
 
             // allow the shell connections via port 1337 (default)
             Pair.of("dbms.shell.enabled", "true"),
-            Pair.of("dbms.shell.host", "127.0.0.1"),
-            Pair.of("dbms.shell.port", "1337")
+            Pair.of("dbms.shell.host", bindHost),
+            Pair.of("dbms.shell.port", shellPort)
 
             /*
-            # Enable a remote shell server which Neo4j Shell clients can log in to.
-            #dbms.shell.enabled=true
-            # The network interface IP the shell will listen on (use 0.0.0.0 for all interfaces).
-            #dbms.shell.host=127.0.0.1
-            # The port the shell will listen on, default is 1337.
-            #dbms.shell.port=1337
-             */
-
-            //
+                # Enable a remote shell server which Neo4j Shell clients can log in to.
+                #dbms.shell.enabled=true
+                # The network interface IP the shell will listen on (use 0.0.0.0 for all interfaces).
+                #dbms.shell.host=127.0.0.1
+                # The port the shell will listen on, default is 1337.
+                #dbms.shell.port=1337
+            */
         );
         // ^^ serverBootstrapper.start() also registered shutdown hook!
 
