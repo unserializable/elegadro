@@ -79,7 +79,7 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
                     <archive>
-                        <addMavenDescriptor>false</addMavenDescriptor>
+                        <addMavenDescriptor>true</addMavenDescriptor>
                         <compress>true</compress>
                     </archive>
                 </configuration>
