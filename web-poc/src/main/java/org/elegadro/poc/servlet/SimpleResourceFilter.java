@@ -35,11 +35,11 @@ public class SimpleResourceFilter implements Filter {
         if (servletPath.startsWith("/assets/img/")) {
             serveImg(request.getServletContext(), response, "/patternfly/img/" + servletPath.substring("/assets/img/".length()));
         } else if (requestURL.endsWith(".woff2")) {
-            serveWoff2(request.getServletContext(), response, "/patternfly" + servletPath);
-        }  else if (requestURL.endsWith(".woff")) {
-            serveWoff(request.getServletContext(), response, "/patternfly" + servletPath);
+            serveWoff2(request.getServletContext(), response, "/patternfly/fonts" + requestURL.substring(requestURL.lastIndexOf('/')));
+        } else if (requestURL.endsWith(".woff")) {
+            serveWoff(request.getServletContext(), response, "/patternfly/fonts" + requestURL.substring(requestURL.lastIndexOf('/')));
         } else if (requestURL.endsWith(".ttf")) {
-            serveTtf(request.getServletContext(), response, "/patternfly" + servletPath);
+            serveTtf(request.getServletContext(), response, "/patternfly/fonts" + requestURL.substring(requestURL.lastIndexOf('/')));
         } else {
             chain.doFilter(request, response);
         }
@@ -97,6 +97,9 @@ public class SimpleResourceFilter implements Filter {
     }
 
     private void serveResource(ServletContext servletContext, ServletResponse response, String path) throws IOException {
+        if (log.isDebugEnabled()) {
+            log.debug("About to serve resource from '" + path + "'" + " of ServletContext.");
+        }
         ServletContextResource scResource = new ServletContextResource(servletContext, path);
         if (log.isDebugEnabled()) {
             log.debug("About to serve resource from " + scResource.getURL());

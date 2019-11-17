@@ -19,6 +19,10 @@
         <appender-ref ref="STDOUT" />
     </logger>
 
+    <logger name="org.elegadro.poc.servlet" level="debug" additivity="false">
+        <appender-ref ref="STDOUT" />
+    </logger>
+
     <logger name="org.elegadro.rt.service.law.impl" level="debug" additivity="false">
         <appender-ref ref="STDOUT" />
     </logger>
