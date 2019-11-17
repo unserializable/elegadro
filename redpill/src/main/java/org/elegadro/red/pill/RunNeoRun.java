@@ -2,7 +2,6 @@ package org.elegadro.red.pill;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.elegadro.iota.legal.LawParticleEnum;
 import org.elegadro.iota.legal.LegalMolecul;
 import org.elegadro.iota.legal.LegalParticle;
@@ -16,7 +15,6 @@ import org.neo4j.server.NeoServer;
 import org.neo4j.server.ServerBootstrapper;
 
 import java.io.*;
-import java.net.URL;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
