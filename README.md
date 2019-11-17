@@ -29,7 +29,7 @@ represented as simply as:
 
 ```
 MATCH (s:Seadus)-[]->(n)
-WHERE s.text='Võlaõigusseadus'
+WHERE s.tr_et='Võlaõigusseadus'
 RETURN n;
 ```
 The highlight here is the fact that _all_ kinds of relationships from _s_ to
@@ -63,7 +63,6 @@ fully empty in the VÕS XML document, as in the snippet below:
   <kuvatavNr><![CDATA[6. osa]]></kuvatavNr>
   <osaPealkiri>KOMPROMISSILEPING</osaPealkiri>
 </osa>
-
 ```
 
 However, due to weak semantics in the RT website HTML, parsing XML sources
@@ -163,7 +162,7 @@ mvn clean install
 Note that initialization of Elegadro graph database requires internet connection to be
 present. Open separate console in `elegadro/redpill` folder and execute:
 ```
-java -jar target/redpill-0.4.0-SNAPSHOT.jar
+java -jar target/redpill-0.5.0-SNAPSHOT.jar
 ```
 
 Wait until program gives a message about database having been started. On the
