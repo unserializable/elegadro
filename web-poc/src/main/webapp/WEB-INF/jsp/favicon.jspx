@@ -4,6 +4,7 @@
         xmlns="http://www.w3.org/1999/xhtml"
         version="2.0">
 
+    <![CDATA[<link rel="icon" href="data:;base64,iVBORw0KGgo=">]]>
     <!-- ****** faviconit.com favicons ****** -->
     <!-- link rel="shortcut icon" href="${pageContext.request.getServletPath()}/fileimporter/fav/favicon.ico"/-->
 
