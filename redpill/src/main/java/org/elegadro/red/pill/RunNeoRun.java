@@ -1,5 +1,8 @@
 package org.elegadro.red.pill;
 
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.elegadro.iota.legal.LawParticleEnum;
 import org.elegadro.iota.legal.LegalMolecul;
 import org.elegadro.iota.legal.LegalParticle;
@@ -12,8 +15,8 @@ import org.neo4j.server.CommunityBootstrapper;
 import org.neo4j.server.NeoServer;
 import org.neo4j.server.ServerBootstrapper;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.net.URL;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -28,6 +31,7 @@ import static org.elegadro.iota.legal.number.LegalNumber.*;
 public class RunNeoRun {
     private static final Path WRITABLE_PATH;
 
+    private static final Path ELEGADRO_DATA_PATH;
     private static final Path ELEGADRO_RT_XML_SAVE_PATH;
     private static final Path ELEGADRO_RT_XML_EN_SAVE_PATH;
     private static final Path ELEGADRO_NEO_DATADIR;
@@ -49,11 +53,12 @@ public class RunNeoRun {
             System.err.println("No writable path detected. Exiting.");
             System.exit(1);
         }
-        System.out.println("Detected writable path '" + WRITABLE_PATH + "'.");
+        ELEGADRO_DATA_PATH = WRITABLE_PATH.resolve("elegadro_" + getSelfVersion());
+        System.out.println("Detected writable path '" + WRITABLE_PATH + "', storing Elegadro data in '" +  ELEGADRO_DATA_PATH + "'.");
 
-        ELEGADRO_RT_XML_SAVE_PATH = WRITABLE_PATH.resolve("elegadro/rt-law-xml");
+        ELEGADRO_RT_XML_SAVE_PATH = ELEGADRO_DATA_PATH.resolve("rt-law-xml");
         ELEGADRO_RT_XML_EN_SAVE_PATH = ELEGADRO_RT_XML_SAVE_PATH.resolve("tr-en");
-        ELEGADRO_NEO_DATADIR = WRITABLE_PATH.resolve("elegadro/neo-data");
+        ELEGADRO_NEO_DATADIR = ELEGADRO_DATA_PATH.resolve("neo-data");
     }
 
     public static void main(String[] args) throws IOException {
@@ -442,5 +447,37 @@ public class RunNeoRun {
             if (exitOnFailure)
                 System.exit(3);
         }
+    }
+
+    //
+    // JUGGLE SOME TO KNOW THE VERSION OF SELF
+    //
+
+    /* Inspired from: https://stackoverflow.com/questions/3697449/retrieve-version-from-maven-pom-xml-in-code */
+    private static String getSelfVersion() {
+        Package selfPackage = RunNeoRun.class.getPackage();
+        if (selfPackage != null) {
+            String implementationVersion = selfPackage.getImplementationVersion();
+            if (null != implementationVersion)
+                return implementationVersion;
+        }
+
+        InputStream pomStream ;
+        try {
+            pomStream = new FileInputStream("redpill/pom.xml");
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        MavenXpp3Reader xpp3Reader = new MavenXpp3Reader();
+        Model model = null;
+
+        try {
+            model = xpp3Reader.read(pomStream);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return model.getVersion();
     }
 }
