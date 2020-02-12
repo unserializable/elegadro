@@ -18,7 +18,7 @@ public class DecimalArabicSupUtilTest {
     @Test
     public void minus1_to_sup() {
         String s = DecimalArabicSupUtil.int2sup(-1);
-        System.out.println("1 to superscript -> :" + s);
+        System.out.println("-1 to superscript -> :" + s);
         Assert.assertEquals("\u207B\u00B9", s);
     }
 
@@ -49,7 +49,6 @@ public class DecimalArabicSupUtilTest {
         System.out.println(Integer.MIN_VALUE + " to superscript -> :" + s);
         Assert.assertEquals( "\u207B\u00B2\u00B9\u2074\u2077\u2074\u2078\u00B3\u2076\u2074\u2078", s);
     }
-    // 1234 678
 
     @Test
     public void plus950_to_sup() {
