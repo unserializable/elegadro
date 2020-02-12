@@ -21,7 +21,7 @@ public final class DecimalArabicSupUtil {
         '\u2079'  /* ^9 */
     };
 
-    /** This only works with _positive_ integers, as it stands. */
+    /** Converts given integer to UNICODE superscript representation. */
     public static String int2sup(int i) {
         StringBuilder sb = new StringBuilder(11).append(i);
         int l = sb.length();
