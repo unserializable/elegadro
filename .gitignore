@@ -14,6 +14,8 @@
 # Maven
 log/
 target/
+.mvn/wrapper/maven-wrapper.jar
+
 
 # Maven Shade plugin
 dependency-reduced-pom.xml
