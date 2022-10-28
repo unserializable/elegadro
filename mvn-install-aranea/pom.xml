@@ -118,7 +118,7 @@
                             <goal>download-single</goal>
                         </goals>
                         <configuration>
-                            <url>https://dl.bintray.com/nortal/araneaframework/araneaframework/aranea-mvc/${aranea.version}</url>
+                            <url>https://github.com/unserializable/elegadro/raw/mvn-repo/nortal/araneaframework/araneaframework/aranea-mvc/${aranea.version}</url>
                             <fromFile>aranea-${aranea.version}.jar</fromFile>
                             <toDir>${applibs.folder}</toDir>
                         </configuration>
@@ -131,7 +131,7 @@
                             <goal>download-single</goal>
                         </goals>
                         <configuration>
-                            <url>https://dl.bintray.com/nortal/araneaframework/base64/base64/${aranea.base64.version}</url>
+                           <url>https://github.com/unserializable/elegadro/raw/mvn-repo/nortal/araneaframework/base64/base64/${aranea.base64.version}</url>
                             <fromFile>base64-${aranea.base64.version}.jar</fromFile>
                             <toDir>${applibs.folder}</toDir>
                         </configuration>
